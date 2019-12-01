@@ -1,0 +1,37 @@
+\section{Einstieg} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+%------------------------------------------------
+
+ % A subsection can be created just before a set of slides with a common theme to further break down your presentation into chunks
+
+
+\subsection{Was sind VRP} 
+\begin{frame}
+\frametitle{Idee VRP}
+
+\end{frame}
+\subsection{Wofür brauch man VRP}
+\begin{frame}
+\frametitle{Klassiches VRP Problem}
+\begin{columns}[T] % align columns
+\begin{column}{.48\textwidth}
+\centering
+\begin{tikzpicture}
+
+\def \n {5}
+\def \radius {3cm}
+\def \margin {8} % margin in angles, depends on the radius
+
+\foreach \s in {1,...,\n}
+{
+  \node[draw, circle] at ({360/\n * (\s - 1)}:\radius) {$\s$};
+  \draw[->, >=latex] ({360/\n * (\s - 1)+\margin}:\radius) 
+    arc ({360/\n * (\s - 1)+\margin}:{360/\n * (\s)-\margin}:\radius);
+}
+\end{tikzpicture} 
+    \caption{Klassisches Problem grafisch Dargestellt} \label{CIA}
+\end{column}%
+\hfill%
+
+
+\end{columns}
+\end{frame}
