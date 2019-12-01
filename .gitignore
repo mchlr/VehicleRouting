@@ -4,7 +4,11 @@ jar/*
 target/*
 .idea/*
 .settings/*
+
 .vscode/*
+src/.vscode/*
+
+
 .classpath
 .swp
 .project
