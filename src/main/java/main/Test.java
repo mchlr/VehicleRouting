@@ -14,7 +14,9 @@ public class Test {
 
     public static void main(String[] args) throws IOException {
         System.out.println("---------- Starting ----------");
+        System.out.println("hi");
 
+        
         Gson myGS = new Gson();    
 
         String fileName = "/Users/mrenn/Documents/Private/Studium/Sem5/DataScience/VehicleRouting/data/bier127.json";
