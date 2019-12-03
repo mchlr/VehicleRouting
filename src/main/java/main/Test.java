@@ -9,15 +9,16 @@ import com.google.gson.Gson;
 
 import model.CVRPProblem;
 import model.CVRPProblemInstance;
+import model.Pheromones;
 
 public class Test {
 
     public static void main(String[] args) throws IOException {
         System.out.println("---------- Starting ----------");
 
-        Gson myGS = new Gson();    
+        Gson myGS = new Gson();
 
-        String fileName = "/Users/mrenn/Documents/Private/Studium/Sem5/DataScience/VehicleRouting/data/bier127.json";
+        String fileName = "C:\\Users\\krieg\\Documents\\VehicleRouting\\data\\bier127.json";
         File file = new File(fileName);
         FileReader fr = new FileReader(file);
         BufferedReader br = new BufferedReader(fr);
@@ -34,5 +35,24 @@ public class Test {
         CVRPProblemInstance bierbierbier = new CVRPProblemInstance(test);
 
         System.out.println("---------- DONE ----------");
+
+
+        Pheromones phero = new Pheromones();
+
+
+        phero.initPhero(bierbierbier.adjacencyMatrix, 1.0);
+        phero.cloneAdjMatrix(bierbierbier.adjacencyMatrix);
+        phero.printclone();
+        phero.initway();
+        phero.print();
+        System.out.println("----------  ----------");
+        phero.updatePhero();
+        System.out.println("----------  ----------");
+        phero.print();
+
+       // System.out.println("["+phero.getIlist()+","+phero.getJlist() +"]");
+
+
+
     }
 }
