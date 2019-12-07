@@ -25,9 +25,9 @@ public class CVRPProblemInstance {
             case "EUC_2D":
                 // O(n^2) :(
                 for(int i = 0; i < coords.length; i++) {
-                    for(int j = 0; j < coords.length; j++) {
+                    for(int j = i; j < coords.length; j++) {
                         // Distance from i -> j
-                        ret[i][j] = Math.sqrt( Math.pow(coords[i][0] -coords[j][0],2) + Math.pow(coords[i][1] -coords[j][1], 2) );
+                        ret[i][j] = Math.sqrt( Math.pow(coords[i][0]-coords[j][0],2) + Math.pow(coords[i][1]-coords[j][1], 2) );
                     }
                 }
                 break;
@@ -37,5 +37,14 @@ public class CVRPProblemInstance {
                 return null;
         }
         return ret;
+    }
+
+    public Double getDistance(int i, int j) {
+        // Always use the smaller idx as the col;
+        return i < j ? this.adjacencyMatrix[i][j] : this.adjacencyMatrix[j][i];
+    }
+
+    public Integer getDimensions() {
+        return this.dimension;
     }
 }
