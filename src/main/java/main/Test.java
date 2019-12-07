@@ -18,7 +18,9 @@ public class Test {
 
         Gson myGS = new Gson();
 
-        String fileName = "C:\\Users\\krieg\\Documents\\VehicleRouting\\data\\bier127.json";
+        // Note base-path on mac os is /VehicleRouting/;
+
+        String fileName = "data/bier127.json";
         File file = new File(fileName);
         FileReader fr = new FileReader(file);
         BufferedReader br = new BufferedReader(fr);
