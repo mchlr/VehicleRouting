@@ -11,5 +11,6 @@ public class CVRPProblem {
     public Integer dimension;
     public String edge_weight_type;
     public int[][] node_coordinates;
-
+    public int[][] demand_section;
+    public int[] depot_section;
 }
