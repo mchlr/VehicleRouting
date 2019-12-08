@@ -41,6 +41,9 @@ public class ACOSolver {
             System.out.println("Ant#" + i + " - Length: " + antInstances.get(i).getTourCost());
         }
 
+        // TODO: Add heuristics here;
+
+
         // Update the pheromone-matrix
         System.out.println("PRE-UPDATE PheroMatrix:");
         System.out.println(Arrays.deepToString(this.phero));
@@ -55,12 +58,13 @@ public class ACOSolver {
         System.out.println(Arrays.deepToString(this.phero));
 
 
+        // TODO: Pass the updated Phero-Matrix into an Ant after update;
+
     }
 
     private void pheroDeposition(List<Ant> topAnts) {
         int sig = topAnts.size();
         int lamb = 1;
-
 
         List<Integer> bestTour = null;
         double bestTourCost = Double.MAX_VALUE;
@@ -75,7 +79,7 @@ public class ACOSolver {
             List<Integer> antTour = currAnt.getTour();
 
             for(int i = 0; i < antTour.size()-1; i++) {
-                double sigLamb = this.phero[antTour.get(i)][antTour.get(i+1)] + (sig-lamb)/currAnt.getTourCost(); 
+                double sigLamb = /* this.phero[antTour.get(i)][antTour.get(i+1)] +*/ (sig-lamb)/currAnt.getTourCost(); 
                 
                 // TODO: Check, if the current Arc (i -> i+1) is a part of bestTour;
                 double sigStar = containsArc(bestTour, new int[]{antTour.get(i), antTour.get(i+1)} ) ? (sig/bestTourCost) : 0;
