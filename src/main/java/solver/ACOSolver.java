@@ -35,16 +35,8 @@ public class ACOSolver {
             antIdx++;
         }
 
-        // Generate a tour with each available ant;
+        // Report Ant stats;
         for(int i = 0; i < antInstances.size(); i++) {
-            List<Integer> tour = antInstances.get(i).getTour();
-            double tourCost = 0;
-
-            // Calculate the tour costs/length for each ant;
-            for(int j = 0; j < tour.size()-1; j++){
-                tourCost += this.ref.getDistance(tour.get(i), tour.get(i+1));
-            }
-            antInstances.get(i).setTourCost(tourCost);
             System.out.println("Ant#" + i + " - Length: " + antInstances.get(i).getTourCost());
         }
 
@@ -125,7 +117,7 @@ public class ACOSolver {
 
     private void initailizeAnts(int n, double [][] probMat) {
         for(int i = 0; i < n; i++) {
-            this.antInstances.add(new Ant(probMat));
+            this.antInstances.add(new Ant(probMat, ref.capacity));
         }
     }
 
