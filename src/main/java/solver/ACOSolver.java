@@ -2,6 +2,8 @@ package solver;
 
 import java.util.*;
 
+
+
 import model.CVRPProblemInstance;
 
 public class ACOSolver {
@@ -12,16 +14,20 @@ public class ACOSolver {
     private double alpha ;
     private double beta;
     private double gamma;
+    private double roh;
+    private double theta;
     private List<Ant> antInstances; 
 
 
-    public ACOSolver(CVRPProblemInstance ref, int antAmount, double alpha, double beta, double gamma) {
+    public ACOSolver(CVRPProblemInstance ref, int antAmount, double alpha, double beta, double gamma, double roh, double theta) {
         this.ref = ref;
         this.antInstances = new ArrayList<>();
         this.alpha =alpha;
         this.beta = beta;
         this.gamma = gamma;
         this.probMat = null;
+        this.roh = roh;
+        this.theta = theta;
         initializePheroMatrix();
         initailizeAnts(antAmount, probMat);
     }
@@ -53,17 +59,25 @@ public class ACOSolver {
 
         // Update the pheromone-matrix
         System.out.println("PRE-UPDATE PheroMatrix:");
-        System.out.println(Arrays.deepToString(this.phero));
-
+        // System.out.println(Arrays.deepToString(this.phero));
+        prettyprintmatrix(this.phero);
 
         // TODO: Add function which gets the top-n Ants (top in regard to tourCost);
         // Just pass all the ants into the pheroDeposition
-        pheroDeposition(antInstances);
-        System.out.println("\n");
 
+        pheroVaporated();
         System.out.println("POST-UPDATE PheroMatrix:");
-        System.out.println(Arrays.deepToString(this.phero));
-
+        System.out.println("Vaporisation");
+        System.out.println("\n");
+       // System.out.println(Arrays.deepToString(this.phero));
+        prettyprintmatrix(this.phero);
+        System.out.println("\n");
+        pheroDeposition(antInstances);
+        System.out.println("POST-UPDATE PheroMatrix:");
+        System.out.println("Deposition");
+        System.out.println("\n");
+     //   System.out.println(Arrays.deepToString(this.phero));
+        prettyprintmatrix(this.phero);
 
         // TODO: Pass the updated Phero-Matrix into an Ant after update;
 
@@ -96,6 +110,27 @@ public class ACOSolver {
             lamb += 1;
         }
     }
+
+    // Calc Lavg for Vaporated
+    private double Lavg(List<Ant> sweetants){
+        double lavg = 0;
+
+        for( Ant antworker : sweetants){
+
+            lavg += antworker.getTourCost() / sweetants.size();
+        }
+        return lavg;
+    }
+
+    // Update PheroMatrix with Vaporated Method
+    private void pheroVaporated () {
+
+        for (int i = 0; i < phero.length; i++)
+            for (int j = 0; j < phero.length; j++) {
+                phero[i][j] = (roh + (theta / Lavg(antInstances))) * phero[i][j];
+            }
+        }
+
     
     private boolean containsArc(List<Integer> bestTour, int[] targetArc) {
         for(int y = 0; y < bestTour.size()-1; y++) {
@@ -130,25 +165,36 @@ public class ACOSolver {
     }
 
 
-    private void calcProbs(){
+    private void calcProbs() {
         double sumProbDis = 0;
 
 
-        for (int i = 0; i<ref.getDimensions(); i++){
-            for (int j = 0; j<ref.getDimensions(); j++){
-                sumProbDis += Math.pow(phero[i][j], alpha) * Math.pow(1/ref.getDistance(i,j),beta)* Math.pow(ref.getDistance(i,0)+ref.getDistance(0,j)-ref.getDistance(i,j),gamma);
+        for (int i = 0; i < ref.getDimensions(); i++) {
+            for (int j = 0; j < ref.getDimensions(); j++) {
+                sumProbDis += Math.pow(phero[i][j], alpha) * Math.pow(1 / ref.getDistance(i, j), beta) * Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma);
 
             }
         }
 
-        for (int i = 0; i<ref.getDimensions(); i++){
-            for (int j = 0; j<ref.getDimensions(); j++){
-                probMat[i][j] = (Math.pow(phero[i][j], alpha) * Math.pow(1/ref.getDistance(i,j),beta) * Math.pow(ref.getDistance(i,0)+ref.getDistance(0,j)-ref.getDistance(i,j),gamma)) / (sumProbDis);
+        for (int i = 0; i < ref.getDimensions(); i++) {
+            for (int j = 0; j < ref.getDimensions(); j++) {
+                probMat[i][j] = (Math.pow(phero[i][j], alpha) * Math.pow(1 / ref.getDistance(i, j), beta) * Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma)) / (sumProbDis);
             }
         }
+
+    }
+       private void prettyprintmatrix (double[][] Matrix){
+                Arrays.stream(Matrix).forEach(
+                                (row) -> {
+                                    System.out.print("[");
+                                    Arrays.stream(row).forEach((el) -> System.out.print(" " + el + " "));
+                                    System.out.println("]");
+                                }
+                        );
+            }
+
 
 
     }
 
 
-}

@@ -21,7 +21,7 @@ public class Test {
 
         // Note base-path on mac os is "/VehicleRouting/"";
 
-        String fileName = "data/bier127.json";
+        String fileName = "data/att48.json";
         File file = new File(fileName);
         FileReader fr = new FileReader(file);
         BufferedReader br = new BufferedReader(fr);
@@ -39,7 +39,23 @@ public class Test {
 
         System.out.println("---------- DONE ----------");
 
-        ACOSolver mySolv = new ACOSolver(bier, 3, 1,1,1);
+
+        //-----PARAMETER for AOC-------//
+
+        int antAmount = 3;
+
+        //------ weights for Probabilitycalculation ------ //
+        double alpha = 1; //weight Pheromonvalue
+        double beta = 1; // weight Attractivness
+        double gamma = 1; // weight Favoability
+        //------ parameters for Vaporation ------ //
+        double roh = 0.8;
+        double theta = 80;
+
+
+
+
+        ACOSolver mySolv = new ACOSolver(bier, 3, 1,1,1, 0.8,80);
         mySolv.solve();
 
 
