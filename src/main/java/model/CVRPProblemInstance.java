@@ -7,6 +7,7 @@ public class CVRPProblemInstance {
         this.comment = base.comment;
         this.type = base.type;
         this.dimension = base.dimension;
+        this.capacity = base.capacity;
         this.adjacencyMatrix = convertCoordinates(base.node_coordinates, base.edge_weight_type);
         this.demands = convertDemands(base.demand_section);
         this.depots = convertDepots(base.depot_section);
@@ -16,6 +17,7 @@ public class CVRPProblemInstance {
     public String comment;
     public String type;
     public Integer dimension;
+    public int capacity;
     public String edge_weight_type;
     public double[][] adjacencyMatrix;
     public int[] demands;
