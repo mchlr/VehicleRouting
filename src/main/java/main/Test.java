@@ -21,7 +21,7 @@ public class Test {
 
         // Note base-path on mac os is "/VehicleRouting/"";
 
-        String fileName = "data/bier127.json";
+        String fileName = "data/att48.json";
         File file = new File(fileName);
         FileReader fr = new FileReader(file);
         BufferedReader br = new BufferedReader(fr);
