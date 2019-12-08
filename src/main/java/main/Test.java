@@ -9,7 +9,6 @@ import com.google.gson.Gson;
 
 import model.CVRPProblem;
 import model.CVRPProblemInstance;
-import model.Pheromones;
 
 import solver.ACOSolver;
 
@@ -40,22 +39,9 @@ public class Test {
 
         System.out.println("---------- DONE ----------");
 
-        ACOSolver mySolv = new ACOSolver(bier, 3);
+        ACOSolver mySolv = new ACOSolver(bier, 3, 1,1,1);
         mySolv.solve();
 
-
-        // Pheromones phero = new Pheromones();
-        // phero.initPhero(bierbierbier.adjacencyMatrix, 1.0);
-        // phero.cloneAdjMatrix(bierbierbier.adjacencyMatrix);
-        // phero.printclone();
-        // phero.initway();
-        // phero.print();
-        // System.out.println("----------  ----------");
-        // phero.updatePhero();
-        // System.out.println("----------  ----------");
-        // phero.print();
-
-       // System.out.println("["+phero.getIlist()+","+phero.getJlist() +"]");
 
 
 

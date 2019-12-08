@@ -7,16 +7,22 @@ import model.CVRPProblemInstance;
 public class Ant {
     private List<Integer> tour;
     private double tourCost;
+    private double [][] probMat;
 
-    public Ant() {
+    public Ant(double [][] probMat) {
         tourCost = 0;
         tour = new ArrayList<>();
+        this.probMat = probMat;
     }
 
     public void sovleProblem(CVRPProblemInstance prob) {
-        generateRandomTour(prob);
-    }
 
+        if (probMat == null) {
+            generateRandomTour(prob);
+        } else {
+            //ToDo Run prob - based tour
+        }
+    }
     public List<Integer> getTour() {
         return this.tour;
     }
@@ -52,5 +58,13 @@ public class Ant {
         this.tour.add(0);
         this.tourCost += prob.getDistance(this.tour.get(this.tour.size() - 1), 0);
     }
+
+
+
+
+
+
+
+
 
 }

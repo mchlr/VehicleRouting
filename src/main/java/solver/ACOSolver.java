@@ -8,15 +8,22 @@ public class ACOSolver {
 
     CVRPProblemInstance ref;
     private double[][] phero;
-
+    private double [][] probMat;
+    private double alpha ;
+    private double beta;
+    private double gamma;
     private List<Ant> antInstances; 
 
 
-    public ACOSolver(CVRPProblemInstance ref, int antAmount) {
+    public ACOSolver(CVRPProblemInstance ref, int antAmount, double alpha, double beta, double gamma) {
         this.ref = ref;
         this.antInstances = new ArrayList<>();
+        this.alpha =alpha;
+        this.beta = beta;
+        this.gamma = gamma;
+        this.probMat = null;
         initializePheroMatrix();
-        initailizeAnts(antAmount);
+        initailizeAnts(antAmount, probMat);
     }
 
     public void solve() {
@@ -116,10 +123,31 @@ public class ACOSolver {
         }
     }
 
-    private void initailizeAnts(int n) {
+    private void initailizeAnts(int n, double [][] probMat) {
         for(int i = 0; i < n; i++) {
-            this.antInstances.add(new Ant());
+            this.antInstances.add(new Ant(probMat));
         }
+    }
+
+
+    private void calcProbs(){
+        double sumProbDis = 0;
+
+
+        for (int i = 0; i<ref.getDimensions(); i++){
+            for (int j = 0; j<ref.getDimensions(); j++){
+                sumProbDis += Math.pow(phero[i][j], alpha) * Math.pow(1/ref.getDistance(i,j),beta)* Math.pow(ref.getDistance(i,0)+ref.getDistance(0,j)-ref.getDistance(i,j),gamma);
+
+            }
+        }
+
+        for (int i = 0; i<ref.getDimensions(); i++){
+            for (int j = 0; j<ref.getDimensions(); j++){
+                probMat[i][j] = (Math.pow(phero[i][j], alpha) * Math.pow(1/ref.getDistance(i,j),beta) * Math.pow(ref.getDistance(i,0)+ref.getDistance(0,j)-ref.getDistance(i,j),gamma)) / (sumProbDis);
+            }
+        }
+
+
     }
 
 
