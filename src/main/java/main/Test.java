@@ -53,13 +53,7 @@ public class Test {
         double theta = 80;
 
 
-
-
         ACOSolver mySolv = new ACOSolver(bier, 3, 1,1,1, 0.8,80);
         mySolv.solve();
-
-
-
-
     }
 }
