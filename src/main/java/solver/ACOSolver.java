@@ -1,5 +1,11 @@
 package solver;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import util.*;
@@ -11,6 +17,7 @@ public class ACOSolver {
     CVRPProblemInstance ref;
     private double[][] phero;
     private double[][] probMat;
+    private int antCount;
     private double alpha;
     private double beta;
     private double gamma;
@@ -28,50 +35,76 @@ public class ACOSolver {
         this.probMat = null;
         this.roh = roh;
         this.theta = theta;
+
+        this.antCount = antAmount;
         initializePheroMatrix();
-        initailizeAnts(antAmount, probMat);
+
+        calcProbs();
+
+        initailizeAnts(this.antCount, probMat);
     }
 
     public void solve() {
-        int antIdx = 0;
-        for (Ant nxt : antInstances) {
-            nxt.sovleProblem(this.ref);
-            System.out.println("> Ant #" + antIdx + " generated a Route.");
+        int iterCount = 0;
 
-            antIdx++;
+        System.out.println("Now solving: " + ref.name + " with AntColonyOptimization!");
+
+        while (iterCount < 100) {
+            System.out.println("\n");
+            System.out.println("Iteration #" + iterCount + " started!");
+
+            int antIdx = 0;
+            for (Ant nxt : antInstances) {
+                nxt.sovleProblem(this.ref);
+                System.out.println("> Ant #" + antIdx + " generated a Route.");
+
+                antIdx++;
+            }
+
+            // Report Ant stats;
+            for (int i = 0; i < antInstances.size(); i++) {
+                System.out.println("Ant#" + i + " - Length: " + antInstances.get(i).getTourCost());
+            }
+
+            System.out.println("PRE Phero Update");
+            MatrixHelper.prettyprintmatrix(this.phero);
+
+            // TODO: Add heuristics here;
+
+            pheroVaporated();
+            System.out.println("Pheromons evaoprated...");
+
+            // TODO: Add function which gets the top-n Ants (top in regard to tourCost);
+            // FOR NOW: Just pass all the ants into the pheroDeposition
+            pheroDeposition(antInstances);
+            System.out.println("Pheromons deposited...");
+
+            System.out.println("POST Phero Update");
+            MatrixHelper.prettyprintmatrix(this.phero);
+
+            try {
+                Path currentRelativePath = Paths.get("");
+                String s = currentRelativePath.toAbsolutePath().toString();
+                // System.out.println("Current relative path is: " + s);
+
+                BufferedWriter wr = new BufferedWriter(new FileWriter(new File("output/iter.txt")));
+                wr.close();
+                // System.out.println("Pheromon-Matrix stored in File!");
+            } catch (IOException e) {
+                System.err.println(e);
+                System.err.println("Error while writing Phero-Matrix to file! :(\nContinueing...");
+            }
+
+            // Update the probability matrix, that is being used in the next generation of
+            // Ants;
+            calcProbs();
+
+            // TODO: Pass the updated Phero-Matrix into an Ant after update;
+            this.antInstances = new ArrayList<>();
+            initailizeAnts(this.antCount, probMat);
+
+            iterCount++;
         }
-
-        // Report Ant stats;
-        for (int i = 0; i < antInstances.size(); i++) {
-            System.out.println("Ant#" + i + " - Length: " + antInstances.get(i).getTourCost());
-        }
-
-        // TODO: Add heuristics here;
-
-        // Update the pheromone-matrix
-        System.out.println("PRE-UPDATE PheroMatrix:");
-        // System.out.println(Arrays.deepToString(this.phero));
-        MatrixHelper.prettyprintmatrix(this.phero);
-
-        // TODO: Add function which gets the top-n Ants (top in regard to tourCost);
-        // Just pass all the ants into the pheroDeposition
-
-        pheroVaporated();
-        System.out.println("POST-UPDATE PheroMatrix:");
-        System.out.println("Vaporisation");
-        System.out.println("\n");
-        // System.out.println(Arrays.deepToString(this.phero));
-        MatrixHelper.prettyprintmatrix(this.phero);
-        System.out.println("\n");
-        pheroDeposition(antInstances);
-        System.out.println("POST-UPDATE PheroMatrix:");
-        System.out.println("Deposition");
-        System.out.println("\n");
-        // System.out.println(Arrays.deepToString(this.phero));
-        MatrixHelper.prettyprintmatrix(this.phero);
-
-        // TODO: Pass the updated Phero-Matrix into an Ant after update;
-
     }
 
     private void pheroDeposition(List<Ant> topAnts) {
@@ -155,22 +188,47 @@ public class ACOSolver {
     }
 
     private void calcProbs() {
-        double sumProbDis = 0;
 
-        for (int i = 0; i < ref.getDimensions(); i++) {
-            for (int j = 0; j < ref.getDimensions(); j++) {
-                sumProbDis += Math.pow(phero[i][j], alpha) * Math.pow(1 / ref.getDistance(i, j), beta)
-                        * Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma);
+        if (probMat == null) {
+            System.out.println("calcProbs() - Matrix is null! Initializing...");
+            probMat = new double[ref.getDimensions()][ref.getDimensions()];
 
+            for (int i = 0; i < ref.getDimensions(); i++) {
+                for (int j = 0; j < ref.getDimensions(); j++) {
+                    var koelnCalc = (1.0 / ref.getDimensions()-1);
+                    probMat[i][j] = j == 0 ? 0 : koelnCalc;
+                }
+            }
+        } else {
+            double sumProbDis = 0;
+            for (int i = 0; i < ref.getDimensions(); i++) {
+                for (int j = 0; j < ref.getDimensions(); j++) {
+
+                    // double pheroCalc = Math.pow(phero[i][j], alpha);
+                    // double heustVal = i == j ? 1 : Math.pow(1 / ref.getDistance(i, j), beta);
+                    // double distSafe = Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) -
+                    // ref.getDistance(i, j), gamma);
+
+                    // sumProbDis += pheroCalc * heustVal * distSafe;
+
+                    sumProbDis += Math.pow(phero[i][j], alpha)
+                            * (i == j ? 1 : Math.pow(1 / ref.getDistance(i, j), beta))
+                            * Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma);
+
+                }
+            }
+
+            for (int i = 0; i < ref.getDimensions(); i++) {
+                for (int j = 0; j < ref.getDimensions(); j++) {
+                    probMat[i][j] = ((Math.pow(phero[i][j], alpha)
+                            * (i == j ? 1 : Math.pow(1 / ref.getDistance(i, j), beta))
+                            * Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma))
+                            / (sumProbDis));
+                }
             }
         }
 
-        for (int i = 0; i < ref.getDimensions(); i++) {
-            for (int j = 0; j < ref.getDimensions(); j++) {
-                probMat[i][j] = (Math.pow(phero[i][j], alpha) * Math.pow(1 / ref.getDistance(i, j), beta)
-                        * Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma))
-                        / (sumProbDis);
-            }
-        }
+        System.out.println("Probabilities updated...");
+        MatrixHelper.prettyprintmatrix(probMat);
     }
 }

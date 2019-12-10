@@ -63,7 +63,6 @@ public class CVRPProblemInstance {
 
     private int[] convertDemands(int[][] demandMat) {
         int[] ret = new int[demandMat.length];
-
         int i = 0;
         for(int[] entry : demandMat) {
             ret[i] = entry[1];
@@ -75,7 +74,6 @@ public class CVRPProblemInstance {
 
     private int[] convertDepots(int[] depotMat) {
         int[] ret = new int[depotMat.length];
-
         int i = 0;
         for(int entry : depotMat) {
             // This entry has to be subtracted by -1 to get "real" array indexes
