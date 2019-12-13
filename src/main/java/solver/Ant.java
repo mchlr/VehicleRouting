@@ -19,6 +19,7 @@ public class Ant {
         this.capacity = capacity;
     }
 
+    // Get-Methods;
     public List<Integer> getTour() {
         return this.tour;
     }
@@ -27,6 +28,7 @@ public class Ant {
         return this.tourCost;
     }
 
+    // Starting Point;
     public void sovleProblem(CVRPProblemInstance prob) {
 
         if (probMat == null) {
@@ -41,9 +43,14 @@ public class Ant {
         this.tour.add(0);
         int i = 0;
 
-        var elemCount = this.tour.size();
+        var elemCount = getUniqueCount(this.tour);
 
-        while ((this.tour.size() == 1 ? 1 : getUniqueCount(this.tour)) < (prob.getDimensions() - 1)) {
+        var debugCap = prob.getDimensions()-1;
+
+        while (getUniqueCount(this.tour) < (prob.getDimensions())) {
+
+            var debugCurrent = getUniqueCount(this.tour);
+
 
             if (i != 0) {
                 generateStep(i, prob);
@@ -59,31 +66,93 @@ public class Ant {
     }
 
     private void generateStep(int i, CVRPProblemInstance prob) {
-        
-        double[] probWheel = new double[prob.getDimensions()];
-        for (int x = 0; x < prob.getDimensions(); x++) {
-            for (int y = x; y < prob.getDimensions(); y++) {
-                probWheel[x] += probMat[i][y];
+
+        // Use modDim since we are ignoring the depot node (=> -1) for this;
+        int modDim = prob.getDimensions()-1;
+        //int dMod = -1;
+
+        double[] probWheel = new double[modDim];
+        for (int x = 0; x < modDim; x++) {
+            for (int y = x; y < modDim; y++) {
+                probWheel[x] += probMat[(i-1)][y];
             }
         }
 
         double decision = Math.random();
 
+        var debugWheel = probWheel;
+        var debug = decision;
+        
+
         // Init at 0 since probs doesnt know if one should visit the depot;
-        for (int d = 1; d < probWheel.length - 1; d++) {
-            if (probWheel[d + 1] < decision && decision <= probWheel[d]) {
-                if (!tour.contains(d)) {
-                    if (this.capacity >= (this.load + prob.getDemand(d))) {
-                        tour.add(d);
-                        load += prob.getDemand(d);
-                        System.out.println("Prob move from " + i + " -> " + d);
+        for (int d = 0; d < probWheel.length; d++) {
+
+            // // Strange;
+            // int iMod = (i-1);
+            // // Redundant?
+            // boolean a;
+            // boolean b;
+            // // The last element in the probWheel has to be compared with 0
+            // if(d == probWheel.length - 1){
+            //     a = (decision > 0) ; // Probabily redundant/always true, right?;
+            //     b = decision <= probWheel[d];
+
+                
+            // }
+            // else {
+            //     if(d == iMod) {
+            //         a = (decision > probWheel[d + 2]);
+            //         b = decision <= probWheel[d + 1];
+                    
+            //         // dMod = d+1;
+            //     }
+            //     else {
+            //         // jump over the 0 cell at position i;
+            //         if((d-1) == iMod) {
+            //             a = (decision > probWheel[d + 2]) ;
+            //             b = decision <= probWheel[d];
+
+            //             // dMod = d+1;
+            //         }
+            //         else {
+            //             // Normal comparison without worrying about the value at [i];
+            //             a = (decision > probWheel[d + 1]) ;
+            //             b = decision <= probWheel[d];
+            //         }                   
+            //     }
+                
+            //     dMod = d+1;
+                
+            // }
+
+
+            boolean a = false;
+            boolean b = false;
+            
+            if (d == probWheel.length - 1) {
+                a = 0 < decision; // I guess thats always true^^
+                b = decision <= probWheel[d];
+            }
+            else {
+                a = probWheel[d + 1] < decision;
+                b = decision <= probWheel[d];    
+            }
+            if (a && b) {
+
+                // Also mod the vertex-index since the probabilities within probWheel regard the nodes 1 -> n (Without Depot!);
+                int dMod = d+1; 
+                if (!tour.contains(dMod)) {
+                    if (this.capacity >= (this.load + prob.getDemand(dMod))) {
+                        tour.add(dMod);
+                        load += prob.getDemand(dMod);
+                        System.out.println("Prob move from " + i + " -> " + dMod);
                     } else {
                         tour.add(0);
-                        tour.add(d);
+                        tour.add(dMod);
                         System.out.println("Prob move from " + i + " -> 0");
                         load = 0;
-                        load += prob.getDemand(d);
-                        System.out.println("Prob move from 0 -> " + d);
+                        load += prob.getDemand(dMod);
+                        System.out.println("Prob move from 0 -> " + dMod);
                     }
                     break;
                 } else {
@@ -107,31 +176,7 @@ public class Ant {
     }
 
     private int getUniqueCount(List<Integer> tour) {
-        int count = 0;
-
-        var maxVal = getMaxValue(tour);
-
-        boolean[] check = new boolean[maxVal];
-
-        for (int i = 0; i < maxVal; i++) {
-            if (!check[i]) {
-                check[i] = true;
-                count++;
-            }
-        }
-
-        return count;
-    }
-
-    private int getMaxValue(List<Integer> tour) {
-        Integer max = Integer.MIN_VALUE;
-
-        for (int i = 0; i < tour.size(); i++) {
-            if (max < tour.get(i)) {
-                max = tour.get(i);
-            }
-        }
-        return max;
+        return new HashSet<Integer>(tour).size();
     }
 
     private void calculateTourCost(CVRPProblemInstance prob) {

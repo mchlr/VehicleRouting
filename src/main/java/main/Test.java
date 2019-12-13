@@ -37,9 +37,6 @@ public class Test {
 
         CVRPProblemInstance bier = new CVRPProblemInstance(test);
 
-        System.out.println("---------- DONE ----------");
-
-
         //-----PARAMETER for AOC-------//
 
         int antAmount = 3;
@@ -52,8 +49,10 @@ public class Test {
         double roh = 0.8;
         double theta = 80;
 
-
         ACOSolver mySolv = new ACOSolver(bier, antAmount, alpha, beta, gamma, roh, theta);
         mySolv.solve();
+
+
+        System.out.println("---------- DONE ----------");
     }
 }

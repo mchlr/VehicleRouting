@@ -44,6 +44,7 @@ public class ACOSolver {
         initailizeAnts(this.antCount, probMat);
     }
 
+
     public void solve() {
         int iterCount = 0;
 
@@ -57,13 +58,9 @@ public class ACOSolver {
             for (Ant nxt : antInstances) {
                 nxt.sovleProblem(this.ref);
                 System.out.println("> Ant #" + antIdx + " generated a Route.");
+                System.out.println("Total length: " + nxt.getTourCost());
 
                 antIdx++;
-            }
-
-            // Report Ant stats;
-            for (int i = 0; i < antInstances.size(); i++) {
-                System.out.println("Ant#" + i + " - Length: " + antInstances.get(i).getTourCost());
             }
 
             System.out.println("PRE Phero Update");
@@ -71,35 +68,26 @@ public class ACOSolver {
 
             // TODO: Add heuristics here;
 
+
             pheroVaporated();
-            System.out.println("Pheromons evaoprated...");
+            
 
             // TODO: Add function which gets the top-n Ants (top in regard to tourCost);
             // FOR NOW: Just pass all the ants into the pheroDeposition
             pheroDeposition(antInstances);
-            System.out.println("Pheromons deposited...");
+            
 
             System.out.println("POST Phero Update");
             MatrixHelper.prettyprintmatrix(this.phero);
 
-            try {
-                Path currentRelativePath = Paths.get("");
-                String s = currentRelativePath.toAbsolutePath().toString();
-                // System.out.println("Current relative path is: " + s);
-
-                BufferedWriter wr = new BufferedWriter(new FileWriter(new File("output/iter.txt")));
-                wr.close();
-                // System.out.println("Pheromon-Matrix stored in File!");
-            } catch (IOException e) {
-                System.err.println(e);
-                System.err.println("Error while writing Phero-Matrix to file! :(\nContinueing...");
-            }
+            // Write all the generated tours into a file for later visualization;
+            FileHelper.writeToursToFile(antInstances);
 
             // Update the probability matrix, that is being used in the next generation of
             // Ants;
             calcProbs();
 
-            // TODO: Pass the updated Phero-Matrix into an Ant after update;
+            // Re-Initialize Ants for the next run;
             this.antInstances = new ArrayList<>();
             initailizeAnts(this.antCount, probMat);
 
@@ -107,7 +95,13 @@ public class ACOSolver {
         }
     }
 
+//#region Pheromon Updates
+
     private void pheroDeposition(List<Ant> topAnts) {
+
+        System.out.println("Pheromons deposited...");
+        
+
         int sig = topAnts.size();
         int lamb = 1;
 
@@ -139,6 +133,44 @@ public class ACOSolver {
         }
     }
 
+    // Update PheroMatrix with Vaporated Method
+    private void pheroVaporated() {
+
+        System.out.println("Pheromons evaoprated...");
+
+        for (int i = 0; i < phero.length; i++)
+            for (int j = 0; j < phero.length; j++) {
+                phero[i][j] = (roh + (theta / Lavg(antInstances))) * phero[i][j];
+            }
+    }
+
+//#endregion
+
+// #region Initialization Methods
+
+// Methods for initializing this class (Called within constructor);
+
+private void initializePheroMatrix() {
+    this.phero = new double[this.ref.getDimensions()][this.ref.getDimensions()];
+
+    // Initalize the Pheromone Matrix with all ones;
+    for (int i = 0; i < this.phero.length; i++) {
+        for (int j = 0; j < this.phero.length; j++) {
+            this.phero[i][j] = 1.0;
+        }
+    }
+}
+
+private void initailizeAnts(int n, double[][] probMat) {
+    for (int i = 0; i < n; i++) {
+        this.antInstances.add(new Ant(probMat, ref.capacity));
+    }
+}
+
+
+// #endregion
+
+
     // Calc Lavg for Vaporated
     private double Lavg(List<Ant> sweetants) {
         double lavg = 0;
@@ -150,14 +182,7 @@ public class ACOSolver {
         return lavg;
     }
 
-    // Update PheroMatrix with Vaporated Method
-    private void pheroVaporated() {
 
-        for (int i = 0; i < phero.length; i++)
-            for (int j = 0; j < phero.length; j++) {
-                phero[i][j] = (roh + (theta / Lavg(antInstances))) * phero[i][j];
-            }
-    }
 
     private boolean containsArc(List<Integer> bestTour, int[] targetArc) {
         for (int y = 0; y < bestTour.size() - 1; y++) {
@@ -166,37 +191,48 @@ public class ACOSolver {
             }
         }
         return false;
-    }
+    }   
 
-    // Methods for initializing this class (Called within constructor);
-
-    private void initializePheroMatrix() {
-        this.phero = new double[this.ref.getDimensions()][this.ref.getDimensions()];
-
-        // Initalize the Pheromone Matrix with all ones;
-        for (int i = 0; i < this.phero.length; i++) {
-            for (int j = 0; j < this.phero.length; j++) {
-                this.phero[i][j] = 1.0;
-            }
-        }
-    }
-
-    private void initailizeAnts(int n, double[][] probMat) {
-        for (int i = 0; i < n; i++) {
-            this.antInstances.add(new Ant(probMat, ref.capacity));
-        }
-    }
-
-    private void calcProbs() {
+       private void calcProbs() {
 
         if (probMat == null) {
             System.out.println("calcProbs() - Matrix is null! Initializing...");
-            probMat = new double[ref.getDimensions()][ref.getDimensions()];
 
-            for (int i = 0; i < ref.getDimensions(); i++) {
-                for (int j = 0; j < ref.getDimensions(); j++) {
-                    var koelnCalc = (1.0 / ref.getDimensions()-1);
-                    probMat[i][j] = j == 0 ? 0 : koelnCalc;
+            /*
+                Dimension = 7
+
+                [1, 0] => Depot, ignore this -> -1 Dimension
+                [2, 1],
+                [3, 1],
+                [4, 1],
+                [5, 1],
+
+                [6, 1],
+                [7, 1]
+                => Dont calc a prob to the vertex itself -> -1 Dimension
+
+                [0] => Depot, ignore this -> -1 Dimension
+                [1],
+                [2],
+                [3],
+                [4],
+                [5],
+            */
+
+
+
+
+            // Modified Dimensions for ignoring the depot 
+            // Therefore, use dimensions -1
+            // This implies, that the idx's in the array have to be calculated like (idx+1) in order to get the correct node
+            int modDim = ref.getDimensions()-1;
+
+            probMat = new double[modDim][modDim];
+
+            for (int i = 0; i < modDim; i++) {
+                for (int j = 0; j < modDim; j++) {
+                    var koelnCalc = i==j ? 0 : (1.0 / (modDim-1));
+                    probMat[i][j] = koelnCalc;
                 }
             }
         } else {
