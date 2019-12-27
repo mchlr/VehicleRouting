@@ -3,6 +3,7 @@
 ## Informations
 
 This is the official Repository for work related to the H-BRS's DataScience Project from WS19/20 by Tobias Krieger and Michael Renn.
+Supervised by the one and only Peter "Wackelpeter" Becker.
 
 ## Presentation
 
@@ -26,22 +27,21 @@ python3 visualize.py
 
 ## TODOs
 
-* Add the output of the best route per generation as a file;
-* Check for convergence;
+* Add the output of the best route per generation as a file
+* Check for convergence
 
 ### Pheromon-Matrix
 
 #### General
 The Matrix should be scaled down/cut by one entire column and one row. The column, that is going to be cut, is phero[0] since this column contains the pheromone concentration for ways towards the depot. However, this is not neccessary since the depot is being visited before the capacity constraint would get violated.
 
-
 #### Fix the pheroDeposition()-Method
 This method has to get modified according to the change of the phero-Matrix described above.
 
-**Code**: Everything related to this issue is marked with "// TODO - ArrayFix:" within the source.
+**Info**: Everything related to this issue is marked with "TODO - ArrayFix" within the source code.
 
-* Nodes taken from the generated route has to be reduced by -1 in order to achieve correct matrix indices. However, this assumes, that the 0 nodes (depot) within a route have to be ignored;
-* If a route looks like X -> 0 -> Y the pheromons from X -> Y have to get updated. Its necessary to write an updated logic to tackle this problem;
+* Nodes taken from the generated route have to be reduced by -1 in order to achieve correct matrix indices. However, this assumes that 0 nodes within a route are being ignored
+* Consequently, if a route looks like X -> 0 -> Y the pheromons from X -> Y have to get updated. Its necessary to write an updated logic to tackle this problem
 
 ### Visualizer
 
