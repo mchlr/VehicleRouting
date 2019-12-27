@@ -8,7 +8,7 @@ This is the official Repository for work related to the H-BRS's DataScience Proj
 
 Presentation done via LaTeX in Overleaf
 
-* <Add Link here>
+* (Add Link here)
 
 ## Visualization
 
@@ -45,11 +45,12 @@ This method has to get modified according to the change of the phero-Matrix desc
 
 ### Visualizer
 
+* Add Support for tour-files produced by the program
+* Add the use of matplotlib widgets for cycling through the generated tours
 
 
 ### Heuristics
 Finish implementation of various heuristics:
-
 * n-Opt
 * Random Swaps
 
