@@ -35,7 +35,7 @@ python3 visualize.py
 #### General
 The Matrix should be scaled down/cut by one entire column and one row. The column, that is going to be cut, is phero[0] since this column contains the pheromone concentration for ways towards the depot. However, this is not neccessary since the depot is being visited before the capacity constraint would get violated.
 
-* Add a return to the depot (0) after all nodes have been visited.
+* ~~Add a return to the depot (0) after all nodes have been visited.~~ DONE!
 
 #### Fix the pheroDeposition()-Method
 This method has to get modified according to the change of the phero-Matrix described above.
