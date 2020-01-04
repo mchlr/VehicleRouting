@@ -50,7 +50,7 @@ public class Ant {
 
             } else {
                 // Will only get hit in the first iteration;
-                generateRandomStep(prob);
+                generateStep(0, prob);
             }
 
             // Move to next node;
@@ -61,6 +61,47 @@ public class Ant {
         this.tour.add(0);
     }
 
+    private void generateFirstStep(CVRPProblemInstance prob) {
+        
+        int modDim = prob.getDimensions()-1;
+
+        double[] probWheel = new double[modDim];
+        for (int x = 0; x < modDim; x++) {
+            for (int y = x+1; y <= modDim; y++) {
+                probWheel[x] += probMat[0][y];
+            }
+        }
+
+        var wheelie = probWheel;
+
+        double decision = Math.random();
+
+        for (int d = 0; d < probWheel.length; d++) {
+            boolean a = false;
+            boolean b = false;
+            
+            if (d == probWheel.length - 1) {
+                a = 0 < decision; // I guess thats always true^^
+                b = decision <= probWheel[d];
+            }
+            else {
+                a = probWheel[d + 1] < decision;
+                b = decision <= probWheel[d];    
+            }
+            if (a && b) {
+
+                // Also mod the vertex-index since the probabilities within probWheel regard the nodes 1 -> n (Without Depot!);
+                // Glauben, dass wir das hier nicht brauchen;
+                int dMod = d+1; 
+                
+                tour.add(dMod);
+                load += prob.getDemand(dMod);
+                System.out.println("Prob move from " + 0 + " -> " + dMod);
+            }
+        }
+    }
+
+
     private void generateStep(int i, CVRPProblemInstance prob) {
 
         // Use modDim since we are ignoring the depot node (=> -1) for this;
@@ -69,8 +110,8 @@ public class Ant {
 
         double[] probWheel = new double[modDim];
         for (int x = 0; x < modDim; x++) {
-            for (int y = x; y < modDim; y++) {
-                probWheel[x] += probMat[(i-1)][y];
+            for (int y = x+1; y <= modDim; y++) {
+                probWheel[x] += probMat[(i)][y];
             }
         }
 
@@ -101,14 +142,14 @@ public class Ant {
                     if (this.capacity >= (this.load + prob.getDemand(dMod))) {
                         tour.add(dMod);
                         load += prob.getDemand(dMod);
-                        System.out.println("Prob move from " + i + " -> " + dMod);
+                        //System.out.println("Prob move from " + i + " -> " + dMod);
                     } else {
                         tour.add(0);
                         tour.add(dMod);
-                        System.out.println("Prob move from " + i + " -> 0");
+                        //System.out.println("Prob move from " + i + " -> 0");
                         load = 0;
                         load += prob.getDemand(dMod);
-                        System.out.println("Prob move from 0 -> " + dMod);
+                        // System.out.println("Prob move from 0 -> " + dMod);
                     }
                     break;
                 } else {

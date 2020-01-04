@@ -63,7 +63,7 @@ public class ACOSolver {
             }
 
             System.out.println("PRE Phero Update");
-            MatrixHelper.prettyprintmatrix(this.phero);
+            // MatrixHelper.prettyprintmatrix(this.phero);
 
             // TODO: Add heuristics here;
 
@@ -74,7 +74,7 @@ public class ACOSolver {
             pheroDeposition(antInstances);
 
             System.out.println("POST Phero Update");
-            MatrixHelper.prettyprintmatrix(this.phero);
+            // MatrixHelper.prettyprintmatrix(this.phero);
 
             // Write all the generated tours into a file for later visualization;
             FileHelper.writeToursToFile(antInstances, iterCount);
@@ -89,6 +89,12 @@ public class ACOSolver {
 
             iterCount++;
         }
+
+        System.out.println("Ant Colony finished!!!!!!!!!!");
+        System.out.println("\n");
+
+        MatrixHelper.prettyprintmatrix(this.phero);
+
     }
 
     // #region Initialization Methods
@@ -101,7 +107,7 @@ public class ACOSolver {
         // Initalize the Pheromone Matrix with all ones;
         for (int i = 0; i < this.phero.length; i++) {
             for (int j = 0; j < this.phero.length; j++) {
-                this.phero[i][j] = 1.0;
+                this.phero[i][j] = i==j ? 0.0 : 1.0;
             }
         }
     }
@@ -150,7 +156,7 @@ public class ACOSolver {
         }
 
         System.out.println("Pheromone deposition done");
-        MatrixHelper.prettyprintmatrix(this.phero);
+        // MatrixHelper.prettyprintmatrix(this.phero);
         System.out.println("\n");
     }
 
@@ -166,7 +172,7 @@ public class ACOSolver {
         }
 
         System.out.println("Pheromone evaporation done");
-        MatrixHelper.prettyprintmatrix(this.phero);
+        // MatrixHelper.prettyprintmatrix(this.phero);
         System.out.println("\n");
 
     }
@@ -202,7 +208,7 @@ public class ACOSolver {
             // Therefore, use dimensions -1
             // This implies, that the idx's in the array have to be calculated like (idx+1)
             // in order to get the correct node
-            int modDim = ref.getDimensions() - 1;
+            int modDim = ref.getDimensions();
 
             probMat = new double[modDim][modDim];
 
@@ -233,15 +239,35 @@ public class ACOSolver {
 
             for (int i = 0; i < ref.getDimensions(); i++) {
                 for (int j = 0; j < ref.getDimensions(); j++) {
-                    probMat[i][j] = ((Math.pow(phero[i][j], alpha)
-                            * (i == j ? 1 : Math.pow(1 / ref.getDistance(i, j), beta))
-                            * Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma))
-                            / (sumProbDis));
+
+                    var a =  (Math.pow(phero[i][j], alpha));
+                    var b = (i == j ? 1 : Math.pow(1 / ref.getDistance(i, j), beta));
+
+                    var c_One = -1337.0;
+
+                    if(i == 0) {
+                        c_One = ref.getDistance(i, j);
+                    }
+                    else {
+                        c_One = ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j);
+                    }
+                    var c = Math.pow(c_One, gamma);
+                                        
+                    //var c = Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma);
+
+                    probMat[i][j] = (a * b * c) / (sumProbDis);
+                    // probMat[i][j] = ((Math.pow(phero[i][j], alpha)
+                    //         * (i == j ? 1 : Math.pow(1 / ref.getDistance(i, j), beta))
+                    //         * Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma))
+                    //         / (sumProbDis));
                 }
             }
         }
 
-        System.out.println("Probabilities updated...");
-        MatrixHelper.prettyprintmatrix(probMat);
+        System.out.println("\nProbabilities updated...");
+        // MatrixHelper.fuckYouPrintMatrix(probMat);
+
+
+        var myDebug = probMat;
     }
 }
