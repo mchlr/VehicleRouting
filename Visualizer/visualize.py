@@ -1,6 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+import json
+import glob
+
+
+
 
 coords = [
     [6823, 4674],
@@ -12,10 +17,13 @@ coords = [
     [4687, 1373]
 ]
 
+#tourFiles = glob.glob("../output/*.json")
+#print(tourFiles)
+#exit()
+
 tours = [
-    [0, 6, 4, 3, 2, 0, 1, 5],
-    [0, 6, 1, 5, 3, 0, 2, 4],
-    [0, 5, 3, 4, 2, 0, 6, 1]
+    #[0,2,4,5,0,3,1,6,0], # best tour generated
+    [0,6,5,4,0,3,1,2,0], # worst tour generated
 ]
 
 coordX = []
