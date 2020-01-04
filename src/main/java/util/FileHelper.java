@@ -2,6 +2,8 @@ package util;
 
 import java.io.*;
 import java.util.*;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 
 import com.google.gson.Gson;
 
@@ -23,7 +25,11 @@ public class FileHelper {
             // And then store them as JSON for convenient use in python;
             String json = new Gson().toJson(toExport);
 
-            try (FileWriter fw = new FileWriter(new File("output/tours_gen" + genNum + ".json"))) {
+            String dateTimeInfo = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm"));
+            File file = new File("output/" + dateTimeInfo + "/tours_gen" + genNum + ".json");
+            file.getParentFile().mkdirs(); // < Allows the File/FileWriter to create a directory;
+
+            try (FileWriter fw = new FileWriter(file)) {
                 fw.write(json);
             }
         } catch (IOException e) {
