@@ -21,7 +21,9 @@ public class Test {
 
         // Note base-path on mac os is "/VehicleRouting/"";
 
-        String fileName = "data/att48.json";
+        // String fileName = "data/att48.json";
+        String fileName = "data/att48.json.bark";
+
         File file = new File(fileName);
         FileReader fr = new FileReader(file);
         BufferedReader br = new BufferedReader(fr);
@@ -39,7 +41,9 @@ public class Test {
 
         //-----PARAMETER for AOC-------//
 
-        int antAmount = 3;
+        int iterCount = 100;
+        int antAmount = 5;
+        int topAntCount = 3;
 
         //------ weights for Probabilitycalculation ------ //
         double alpha = 1; //weight Pheromonvalue
@@ -49,7 +53,7 @@ public class Test {
         double roh = 0.8;
         double theta = 80;
 
-        ACOSolver mySolv = new ACOSolver(bier, antAmount, alpha, beta, gamma, roh, theta);
+        ACOSolver mySolv = new ACOSolver(bier, iterCount, antAmount, topAntCount, alpha, beta, gamma, roh, theta);
         mySolv.solve();
 
 
