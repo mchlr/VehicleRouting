@@ -1,5 +1,3 @@
-
-
 jar/*
 target/*
 .idea/*
@@ -12,3 +10,5 @@ src/.vscode/*
 .classpath
 .swp
 .project
+
+output/*
