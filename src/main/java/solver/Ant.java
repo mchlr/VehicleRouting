@@ -34,28 +34,22 @@ public class Ant {
         if (probMat == null) {
             generateRandomTour(prob);
         } else {
-            // ToDo Run prob - based tour
             generateProbabilityBasedTour(prob);
         }
+
+        calculateTourCost(prob);
     }
 
     private void generateProbabilityBasedTour(CVRPProblemInstance prob) {
         this.tour.add(0);
         int i = 0;
 
-        var elemCount = getUniqueCount(this.tour);
-
-        var debugCap = prob.getDimensions()-1;
-
         while (getUniqueCount(this.tour) < (prob.getDimensions())) {
-
-            var debugCurrent = getUniqueCount(this.tour);
-
-
             if (i != 0) {
                 generateStep(i, prob);
 
             } else {
+                // Will only get hit in the first iteration;
                 generateRandomStep(prob);
             }
 
@@ -63,6 +57,8 @@ public class Ant {
             i = tour.get((tour.size() - 1));
         }
 
+        // Return back to depot after all nodes have been visited;
+        this.tour.add(0);
     }
 
     private void generateStep(int i, CVRPProblemInstance prob) {
@@ -86,46 +82,6 @@ public class Ant {
 
         // Init at 0 since probs doesnt know if one should visit the depot;
         for (int d = 0; d < probWheel.length; d++) {
-
-            // // Strange;
-            // int iMod = (i-1);
-            // // Redundant?
-            // boolean a;
-            // boolean b;
-            // // The last element in the probWheel has to be compared with 0
-            // if(d == probWheel.length - 1){
-            //     a = (decision > 0) ; // Probabily redundant/always true, right?;
-            //     b = decision <= probWheel[d];
-
-                
-            // }
-            // else {
-            //     if(d == iMod) {
-            //         a = (decision > probWheel[d + 2]);
-            //         b = decision <= probWheel[d + 1];
-                    
-            //         // dMod = d+1;
-            //     }
-            //     else {
-            //         // jump over the 0 cell at position i;
-            //         if((d-1) == iMod) {
-            //             a = (decision > probWheel[d + 2]) ;
-            //             b = decision <= probWheel[d];
-
-            //             // dMod = d+1;
-            //         }
-            //         else {
-            //             // Normal comparison without worrying about the value at [i];
-            //             a = (decision > probWheel[d + 1]) ;
-            //             b = decision <= probWheel[d];
-            //         }                   
-            //     }
-                
-            //     dMod = d+1;
-                
-            // }
-
-
             boolean a = false;
             boolean b = false;
             
@@ -211,8 +167,7 @@ public class Ant {
                 load += demandJ;
 
                 i += 1;
-            } else {
-            }
+            } else {}
         }
 
         System.out.println("TOUR DONE - BACK 3 DEPOT!");
