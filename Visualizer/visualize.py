@@ -45,20 +45,18 @@ ax.scatter(coords[0][0], coords[0][1], s=200, color='green', label="Depot")
 
 for x in range(1, len(coords)):
     ax.scatter(coords[x][0],coords[x][1], color="gold")
+    ax.annotate(str("#" + str(x)), (coords[x][0],coords[x][1]))
+
+# Print out Informations about the routes into the console;
+for tour in tours: 
+    print(tour)
 
 
+for i in range(len(toursX)):
+  print("#" + str(i) + str(toursX[i]) + "/" + str(toursY[i]))
+  ax.plot(toursX[i], toursY[i], color=np.random.rand(3,), label="Tour #" + str(i))
 
-colors = [
-    "red",
-    "green",
-    "blue",
-]
 
-for i in range(len(toursX)-1):
-    print("#" + str(i) + str(toursX[i]) + "/" + str(toursY[i]))
-    ax.plot(toursX[i], toursY[i], color=colors[i], label="Tour #" + str(i))
-
-#ax.plot(tourX, tourY, color='salmon', label="Tour")
 ax.set_xlabel("x")
 ax.set_ylabel("y")
 ax.grid(True)
