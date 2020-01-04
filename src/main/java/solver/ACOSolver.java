@@ -77,7 +77,7 @@ public class ACOSolver {
             MatrixHelper.prettyprintmatrix(this.phero);
 
             // Write all the generated tours into a file for later visualization;
-            FileHelper.writeToursToFile(antInstances);
+            FileHelper.writeToursToFile(antInstances, iterCount);
 
             // Update the probability matrix, that is being used in the next generation of
             // Ants;

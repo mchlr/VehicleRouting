@@ -1,26 +1,34 @@
 package util;
 
 import java.io.*;
-import java.nio.file.*;
 import java.util.*;
 
+import com.google.gson.Gson;
+
 import solver.Ant;
+import util.model.ExportedTour;
 
 public class FileHelper {
 
 
-    public static void writeToursToFile(List<Ant> ants) {
-        try {
-            Path currentRelativePath = Paths.get("");
-            String s = currentRelativePath.toAbsolutePath().toString();
-            // System.out.println("Current relative path is: " + s);
 
-            BufferedWriter wr = new BufferedWriter(new FileWriter(new File("output/iter.txt")));
-            wr.close();
-            // System.out.println("Pheromon-Matrix stored in File!");
+    public static void writeToursToFile(List<Ant> ants, Integer genNum) {
+        try {
+            List<ExportedTour> toExport = new ArrayList<>();
+
+            // Convert the ant's tour informations;
+            for (Ant current : ants) {
+                toExport.add(new ExportedTour(current));
+            }
+            // And then store them as JSON for convenient use in python;
+            String json = new Gson().toJson(toExport);
+
+            try (FileWriter fw = new FileWriter(new File("output/tours_gen" + genNum + ".json"))) {
+                fw.write(json);
+            }
         } catch (IOException e) {
+            System.err.println("Error while writing Tours to file! :(\n");
             System.err.println(e);
-            System.err.println("Error while writing Phero-Matrix to file! :(\nContinueing...");
         }
     }
 }
