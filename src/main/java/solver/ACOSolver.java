@@ -27,7 +27,7 @@ public class ACOSolver {
     private double theta;
     private List<Ant> antInstances;
 
-    public ACOSolver(CVRPProblemInstance ref, int iterCount, int antAmount, int topAntCount, double alpha, double beta, double gamma, double roh,
+    public ACOSolver(CVRPProblemInstance ref, int iterCount, int antAmount, int topAntCount, double pheroValue, double alpha, double beta, double gamma, double roh,
             double theta) {
         this.ref = ref;
         this.iterCount = iterCount;
@@ -41,7 +41,7 @@ public class ACOSolver {
         this.theta = theta;
 
         this.antCount = antAmount;
-        initializePheroMatrix();
+        initializePheroMatrix(pheroValue);
 
         calcProbs();
 
@@ -58,12 +58,16 @@ public class ACOSolver {
             System.out.println("Iteration #" + iterCount + " started!");
 
             int antIdx = 0;
+            double meanLength = 0;
             for (Ant nxt : antInstances) {
                 nxt.sovleProblem(this.ref);
                 System.out.println("> Ant #" + antIdx + " generated a Tour with length = " + nxt.getTourCost());
+                meanLength += nxt.getTourCost();
                 
                 antIdx++;
             }
+            double avgCost = (meanLength/antInstances.size());
+            System.out.println("> Mean-Length: " + avgCost);
 
             System.out.println("PRE Phero Update");
             // MatrixHelper.prettyprintmatrix(this.phero);
@@ -80,7 +84,7 @@ public class ACOSolver {
             // MatrixHelper.prettyprintmatrix(this.phero);
 
             // Write all the generated tours into a file for later visualization;
-            FileHelper.writeToursToFile(antInstances, iterCount);
+            FileHelper.writeToursToFile(antInstances, avgCost, iterCount);
 
             // Update the probability matrix, that is being used in the next generation of
             // Ants;
@@ -115,13 +119,13 @@ public class ACOSolver {
 
     // Methods for initializing this class (Called within constructor);
 
-    private void initializePheroMatrix() {
+    private void initializePheroMatrix(double initalPhero) {
         this.phero = new double[this.ref.getDimensions()][this.ref.getDimensions()];
 
         // Initalize the Pheromone Matrix with all ones;
         for (int i = 0; i < this.phero.length; i++) {
             for (int j = 0; j < this.phero.length; j++) {
-                this.phero[i][j] = i==j ? 0.0 : 100000.0;
+                this.phero[i][j] = i==j ? 0.0 : initalPhero;
             }
         }
     }

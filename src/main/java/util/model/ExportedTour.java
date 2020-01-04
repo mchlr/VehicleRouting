@@ -1,25 +1,25 @@
 package util.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import solver.Ant;
 
 public class ExportedTour {
-    public double totalCost;
-    public List<Integer> tour;
+    public List<Double> tourCost = new ArrayList<>();
+    public List<List<Integer>> antTour = new ArrayList<>();
+    public Double averageCost;
 
     public ExportedTour() {
-        totalCost = -1;
-        tour = null;
+        tourCost = null;
+        antTour = null;
     }
 
-    public ExportedTour(double cost, List<Integer> tour) {
-        this.totalCost = cost;
-        this.tour = tour;
-    }
-
-    public ExportedTour(Ant template) {
-        this.totalCost = template.getTourCost();
-        this.tour = template.getTour();
+    public ExportedTour(List<Ant> template, Double averageCost) {
+        for(Ant curr : template) {
+            this.antTour.add(curr.getTour());
+            this.tourCost.add(curr.getTourCost());
+        }
+        this.averageCost = averageCost;
     }
 }

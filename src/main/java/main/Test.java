@@ -40,11 +40,11 @@ public class Test {
         CVRPProblemInstance bier = new CVRPProblemInstance(test);
 
         //-----PARAMETER for AOC-------//
-
         int iterCount = 200;
         int antAmount = 15;
         int topAntCount = 5;
 
+        double pheroValue = 100000.0;
         //------ weights for Probabilitycalculation ------ //
         double alpha = 1; //weight Pheromonvalue
         double beta = 1; // weight Attractivness
@@ -53,7 +53,7 @@ public class Test {
         double roh = 0.8;
         double theta = 80;
 
-        ACOSolver mySolv = new ACOSolver(bier, iterCount, antAmount, topAntCount, alpha, beta, gamma, roh, theta);
+        ACOSolver mySolv = new ACOSolver(bier, iterCount, antAmount, topAntCount, pheroValue, alpha, beta, gamma, roh, theta);
         mySolv.solve();
 
 

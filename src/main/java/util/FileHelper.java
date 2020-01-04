@@ -14,18 +14,14 @@ public class FileHelper {
 
     private static String runTimeInfo = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
 
-    public static void writeToursToFile(List<Ant> ants, Integer genNum) {
+    public static void writeToursToFile(List<Ant> ants, Double averageCost, Integer genNum) {
         try {
-            List<ExportedTour> toExport = new ArrayList<>();
+            ExportedTour myExp = new ExportedTour(ants, averageCost);
 
-            // Convert the ant's tour informations;
-            for (Ant current : ants) {
-                toExport.add(new ExportedTour(current));
-            }
             // And then store them as JSON for convenient use in python;
-            String json = new Gson().toJson(toExport);
+            String json = new Gson().toJson(myExp);
 
-            File file = new File("output" + runTimeInfo + "/tours_gen" + genNum + ".json");
+            File file = new File("output/" + runTimeInfo + "/gen_" + genNum + ".json");
             file.getParentFile().mkdirs(); // < Allows the File/FileWriter to create a directory;
 
             try (FileWriter fw = new FileWriter(file)) {

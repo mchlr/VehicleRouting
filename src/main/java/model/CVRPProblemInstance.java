@@ -50,7 +50,7 @@ public class CVRPProblemInstance {
                 for(int i = 0; i < coords.length; i++) {
                     for(int j = i; j < coords.length; j++) {
                         // Distance from i -> j
-                        ret[i][j] = Math.sqrt( Math.pow(coords[i][0]-coords[j][0],2) + Math.pow(coords[i][1]-coords[j][1], 2) );
+                        ret[i][j] = Math.round(100.0 *  ( Math.sqrt( Math.pow(coords[i][0]-coords[j][0],2) + Math.pow(coords[i][1]-coords[j][1], 2)) )) / (100.0);;
                     }
                 }
                 break;
