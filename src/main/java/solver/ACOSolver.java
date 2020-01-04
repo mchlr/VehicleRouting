@@ -17,7 +17,9 @@ public class ACOSolver {
     CVRPProblemInstance ref;
     private double[][] phero;
     private double[][] probMat;
+    private int iterCount;
     private int antCount;
+    private int topAntCount;
     private double alpha;
     private double beta;
     private double gamma;
@@ -25,10 +27,12 @@ public class ACOSolver {
     private double theta;
     private List<Ant> antInstances;
 
-    public ACOSolver(CVRPProblemInstance ref, int antAmount, double alpha, double beta, double gamma, double roh,
+    public ACOSolver(CVRPProblemInstance ref, int iterCount, int antAmount, int topAntCount, double alpha, double beta, double gamma, double roh,
             double theta) {
         this.ref = ref;
+        this.iterCount = iterCount;
         this.antInstances = new ArrayList<>();
+        this.topAntCount = topAntCount;
         this.alpha = alpha;
         this.beta = beta;
         this.gamma = gamma;
@@ -49,16 +53,15 @@ public class ACOSolver {
 
         System.out.println("Now solving: " + ref.name + " with AntColonyOptimization!");
 
-        while (iterCount < 100) {
+        while (iterCount < this.iterCount) {
             System.out.println("\n");
             System.out.println("Iteration #" + iterCount + " started!");
 
             int antIdx = 0;
             for (Ant nxt : antInstances) {
                 nxt.sovleProblem(this.ref);
-                System.out.println("> Ant #" + antIdx + " generated a Route.");
-                System.out.println("Total length: " + nxt.getTourCost());
-
+                System.out.println("> Ant #" + antIdx + " generated a Tour with length = " + nxt.getTourCost());
+                
                 antIdx++;
             }
 
@@ -69,9 +72,9 @@ public class ACOSolver {
 
             pheroVaporated();
 
-            // TODO: Add function which gets the top-n Ants (top in regard to tourCost);
-            // FOR NOW: Just pass all the ants into the pheroDeposition
-            pheroDeposition(antInstances);
+            // Sort Ants by their tour length;
+            antInstances.sort(new TourLengthComparator());
+            pheroDeposition(antInstances.subList(0, topAntCount));
 
             System.out.println("POST Phero Update");
             // MatrixHelper.prettyprintmatrix(this.phero);
@@ -83,6 +86,11 @@ public class ACOSolver {
             // Ants;
             calcProbs();
 
+
+            if(iterCount == this.iterCount-1) {
+                break;
+            }
+
             // Re-Initialize Ants for the next run;
             this.antInstances = new ArrayList<>();
             initailizeAnts(this.antCount, probMat);
@@ -91,6 +99,12 @@ public class ACOSolver {
         }
 
         System.out.println("Ant Colony finished!!!!!!!!!!");
+        System.out.println("\n");
+
+        int i = 1;
+        for(Ant curr : antInstances) {
+            System.out.println(i++ + " = " + curr.getTourCost());
+        }
         System.out.println("\n");
 
         MatrixHelper.prettyprintmatrix(this.phero);
@@ -107,7 +121,7 @@ public class ACOSolver {
         // Initalize the Pheromone Matrix with all ones;
         for (int i = 0; i < this.phero.length; i++) {
             for (int j = 0; j < this.phero.length; j++) {
-                this.phero[i][j] = i==j ? 0.0 : 1.0;
+                this.phero[i][j] = i==j ? 0.0 : 0.1;
             }
         }
     }
@@ -255,7 +269,19 @@ public class ACOSolver {
                                         
                     //var c = Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma);
 
+
+                    // var r_One = ((a * b * c) / (sumProbDis)*100.0);
+                    // var r_Two = Math.round(r_One);
+                    // var r_Three = r_Two/100.0;
+                    // probMat[i][j] = r_Three;
+
                     probMat[i][j] = (a * b * c) / (sumProbDis);
+
+
+
+
+
+
                     // probMat[i][j] = ((Math.pow(phero[i][j], alpha)
                     //         * (i == j ? 1 : Math.pow(1 / ref.getDistance(i, j), beta))
                     //         * Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma))
