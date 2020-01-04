@@ -3,8 +3,9 @@ package solver;
 import java.util.*;
 
 import model.CVRPProblemInstance;
+import util.MatrixHelper;
 
-public class Ant {
+public class Ant implements Comparable {
     private List<Integer> tour;
     private double tourCost;
     private double[][] probMat;
@@ -111,27 +112,36 @@ public class Ant {
         double[] probWheel = new double[modDim];
         for (int x = 0; x < modDim; x++) {
             for (int y = x+1; y <= modDim; y++) {
-                probWheel[x] += probMat[(i)][y];
+                if(this.tour.contains(y)) {
+                    continue;
+                }
+                else {
+                    probWheel[x] += probMat[(i)][y];
+                }
             }
         }
 
+        // double dec_A = Math.random()*100.0;
+        // double dec_B = Math.round(dec_A);
+        // double dec_C = dec_B/100.0;
+        // double decision = dec_C;
+
         double decision = Math.random();
 
-        var debugWheel = probWheel;
+        var debugWheel = probWheel;    
         var debug = decision;
         
-
         // Init at 0 since probs doesnt know if one should visit the depot;
         for (int d = 0; d < probWheel.length; d++) {
             boolean a = false;
             boolean b = false;
             
             if (d == probWheel.length - 1) {
-                a = 0 < decision; // I guess thats always true^^
+                a = 0 <= decision; // I guess thats always true^^
                 b = decision <= probWheel[d];
             }
             else {
-                a = probWheel[d + 1] < decision;
+                a = probWheel[d + 1] <= decision;
                 b = decision <= probWheel[d];    
             }
             if (a && b) {
@@ -142,7 +152,8 @@ public class Ant {
                     if (this.capacity >= (this.load + prob.getDemand(dMod))) {
                         tour.add(dMod);
                         load += prob.getDemand(dMod);
-                        //System.out.println("Prob move from " + i + " -> " + dMod);
+                        
+                        System.out.println(">> New node reached!");
                     } else {
                         tour.add(0);
                         tour.add(dMod);
@@ -151,12 +162,18 @@ public class Ant {
                         load += prob.getDemand(dMod);
                         // System.out.println("Prob move from 0 -> " + dMod);
                     }
+                    // System.out.println(Arrays.toString(probWheel));
                     break;
                 } else {
+                    System.out.println(">> Already reached!");
+
                     // Ant war schon an dem Knoten, der gewählt wurde
                     generateStep(i, prob);
                 }
 
+            }
+            else {
+                System.out.println(">> No Match!");
             }
         }
     }
