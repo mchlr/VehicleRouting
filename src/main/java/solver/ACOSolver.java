@@ -44,7 +44,6 @@ public class ACOSolver {
         initailizeAnts(this.antCount, probMat);
     }
 
-
     public void solve() {
         int iterCount = 0;
 
@@ -68,14 +67,11 @@ public class ACOSolver {
 
             // TODO: Add heuristics here;
 
-
             pheroVaporated();
-            
 
             // TODO: Add function which gets the top-n Ants (top in regard to tourCost);
             // FOR NOW: Just pass all the ants into the pheroDeposition
             pheroDeposition(antInstances);
-            
 
             System.out.println("POST Phero Update");
             MatrixHelper.prettyprintmatrix(this.phero);
@@ -95,13 +91,34 @@ public class ACOSolver {
         }
     }
 
-//#region Pheromon Updates
+    // #region Initialization Methods
+
+    // Methods for initializing this class (Called within constructor);
+
+    private void initializePheroMatrix() {
+        this.phero = new double[this.ref.getDimensions()][this.ref.getDimensions()];
+
+        // Initalize the Pheromone Matrix with all ones;
+        for (int i = 0; i < this.phero.length; i++) {
+            for (int j = 0; j < this.phero.length; j++) {
+                this.phero[i][j] = 1.0;
+            }
+        }
+    }
+
+    private void initailizeAnts(int n, double[][] probMat) {
+        for (int i = 0; i < n; i++) {
+            this.antInstances.add(new Ant(probMat, ref.capacity));
+        }
+    }
+
+    // #endregion
+
+    // #region Pheromon Updates
 
     private void pheroDeposition(List<Ant> topAnts) {
 
-        System.out.println("Pheromons deposited...");
-        
-
+        System.out.println("Pheromone deposition started");
         int sig = topAnts.size();
         int lamb = 1;
 
@@ -131,45 +148,30 @@ public class ACOSolver {
             }
             lamb += 1;
         }
+
+        System.out.println("Pheromone deposition done");
+        MatrixHelper.prettyprintmatrix(this.phero);
+        System.out.println("\n");
     }
 
     // Update PheroMatrix with Vaporated Method
     private void pheroVaporated() {
 
-        System.out.println("Pheromons evaoprated...");
+        System.out.println("Pheromone evaporation started");
 
-        for (int i = 0; i < phero.length; i++)
+        for (int i = 0; i < phero.length; i++) {
             for (int j = 0; j < phero.length; j++) {
                 phero[i][j] = (roh + (theta / Lavg(antInstances))) * phero[i][j];
             }
-    }
-
-//#endregion
-
-// #region Initialization Methods
-
-// Methods for initializing this class (Called within constructor);
-
-private void initializePheroMatrix() {
-    this.phero = new double[this.ref.getDimensions()][this.ref.getDimensions()];
-
-    // Initalize the Pheromone Matrix with all ones;
-    for (int i = 0; i < this.phero.length; i++) {
-        for (int j = 0; j < this.phero.length; j++) {
-            this.phero[i][j] = 1.0;
         }
+
+        System.out.println("Pheromone evaporation done");
+        MatrixHelper.prettyprintmatrix(this.phero);
+        System.out.println("\n");
+
     }
-}
 
-private void initailizeAnts(int n, double[][] probMat) {
-    for (int i = 0; i < n; i++) {
-        this.antInstances.add(new Ant(probMat, ref.capacity));
-    }
-}
-
-
-// #endregion
-
+    // #endregion
 
     // Calc Lavg for Vaporated
     private double Lavg(List<Ant> sweetants) {
@@ -182,8 +184,6 @@ private void initailizeAnts(int n, double[][] probMat) {
         return lavg;
     }
 
-
-
     private boolean containsArc(List<Integer> bestTour, int[] targetArc) {
         for (int y = 0; y < bestTour.size() - 1; y++) {
             if (bestTour.get(y) == targetArc[0] && bestTour.get(y + 1) == targetArc[1]) {
@@ -191,47 +191,24 @@ private void initailizeAnts(int n, double[][] probMat) {
             }
         }
         return false;
-    }   
+    }
 
-       private void calcProbs() {
+    private void calcProbs() {
 
         if (probMat == null) {
             System.out.println("calcProbs() - Matrix is null! Initializing...");
 
-            /*
-                Dimension = 7
-
-                [1, 0] => Depot, ignore this -> -1 Dimension
-                [2, 1],
-                [3, 1],
-                [4, 1],
-                [5, 1],
-
-                [6, 1],
-                [7, 1]
-                => Dont calc a prob to the vertex itself -> -1 Dimension
-
-                [0] => Depot, ignore this -> -1 Dimension
-                [1],
-                [2],
-                [3],
-                [4],
-                [5],
-            */
-
-
-
-
-            // Modified Dimensions for ignoring the depot 
+            // Modified Dimensions for ignoring the depot
             // Therefore, use dimensions -1
-            // This implies, that the idx's in the array have to be calculated like (idx+1) in order to get the correct node
-            int modDim = ref.getDimensions()-1;
+            // This implies, that the idx's in the array have to be calculated like (idx+1)
+            // in order to get the correct node
+            int modDim = ref.getDimensions() - 1;
 
             probMat = new double[modDim][modDim];
 
             for (int i = 0; i < modDim; i++) {
                 for (int j = 0; j < modDim; j++) {
-                    var koelnCalc = i==j ? 0 : (1.0 / (modDim-1));
+                    var koelnCalc = i == j ? 0 : (1.0 / (modDim - 1));
                     probMat[i][j] = koelnCalc;
                 }
             }
