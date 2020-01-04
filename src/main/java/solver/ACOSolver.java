@@ -121,7 +121,7 @@ public class ACOSolver {
         // Initalize the Pheromone Matrix with all ones;
         for (int i = 0; i < this.phero.length; i++) {
             for (int j = 0; j < this.phero.length; j++) {
-                this.phero[i][j] = i==j ? 0.0 : 0.1;
+                this.phero[i][j] = i==j ? 0.0 : 100000.0;
             }
         }
     }

@@ -41,9 +41,9 @@ public class Test {
 
         //-----PARAMETER for AOC-------//
 
-        int iterCount = 100;
-        int antAmount = 5;
-        int topAntCount = 3;
+        int iterCount = 200;
+        int antAmount = 15;
+        int topAntCount = 5;
 
         //------ weights for Probabilitycalculation ------ //
         double alpha = 1; //weight Pheromonvalue

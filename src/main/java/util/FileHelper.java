@@ -12,7 +12,7 @@ import util.model.ExportedTour;
 
 public class FileHelper {
 
-    private static String runTimeInfo = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm"));
+    private static String runTimeInfo = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
 
     public static void writeToursToFile(List<Ant> ants, Integer genNum) {
         try {
@@ -25,7 +25,7 @@ public class FileHelper {
             // And then store them as JSON for convenient use in python;
             String json = new Gson().toJson(toExport);
 
-            File file = new File("output/" + runTimeInfo + "/tours_gen" + genNum + ".json");
+            File file = new File("output" + runTimeInfo + "/tours_gen" + genNum + ".json");
             file.getParentFile().mkdirs(); // < Allows the File/FileWriter to create a directory;
 
             try (FileWriter fw = new FileWriter(file)) {

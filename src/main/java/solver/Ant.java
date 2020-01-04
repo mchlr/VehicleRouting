@@ -5,7 +5,7 @@ import java.util.*;
 import model.CVRPProblemInstance;
 import util.MatrixHelper;
 
-public class Ant implements Comparable {
+public class Ant {
     private List<Integer> tour;
     private double tourCost;
     private double[][] probMat;
@@ -77,6 +77,8 @@ public class Ant implements Comparable {
 
         double decision = Math.random();
 
+        System.out.println("Entscheidung:" + decision);
+
         for (int d = 0; d < probWheel.length; d++) {
             boolean a = false;
             boolean b = false;
@@ -127,6 +129,9 @@ public class Ant implements Comparable {
         // double decision = dec_C;
 
         double decision = Math.random();
+        decision = Math.round(100.0 * decision) / 100.0;
+
+      //  System.out.println("Entscheidung:" + decision);
 
         var debugWheel = probWheel;    
         var debug = decision;
@@ -138,11 +143,11 @@ public class Ant implements Comparable {
             
             if (d == probWheel.length - 1) {
                 a = 0 <= decision; // I guess thats always true^^
-                b = decision <= probWheel[d];
+                b = decision <=Math.round(100.0 *  probWheel[d]) / 100.0;
             }
             else {
-                a = probWheel[d + 1] <= decision;
-                b = decision <= probWheel[d];    
+                a = Math.round(100.0 *  probWheel[d+1]) / 100.0 <= decision;
+                b = decision <= Math.round(100.0 *  probWheel[d]) / 100.0    ;
             }
             if (a && b) {
 
@@ -153,7 +158,7 @@ public class Ant implements Comparable {
                         tour.add(dMod);
                         load += prob.getDemand(dMod);
                         
-                        System.out.println(">> New node reached!");
+                 //       System.out.println(">> New node reached!");
                     } else {
                         tour.add(0);
                         tour.add(dMod);
@@ -165,7 +170,7 @@ public class Ant implements Comparable {
                     // System.out.println(Arrays.toString(probWheel));
                     break;
                 } else {
-                    System.out.println(">> Already reached!");
+                //   System.out.println(">> Already reached!");
 
                     // Ant war schon an dem Knoten, der gewählt wurde
                     generateStep(i, prob);
@@ -173,7 +178,7 @@ public class Ant implements Comparable {
 
             }
             else {
-                System.out.println(">> No Match!");
+             //   System.out.println(">> No Match!");
             }
         }
     }
