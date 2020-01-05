@@ -14,9 +14,9 @@ public class FileHelper {
 
     private static String runTimeInfo = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
 
-    public static void writeToursToFile(List<Ant> ants, Double averageCost, Integer genNum) {
+    public static void writeToursToFile(List<Ant> ants, Double averageCost, double[][] pheroMatrix, Integer genNum) {
         try {
-            ExportedTour myExp = new ExportedTour(ants, averageCost);
+            ExportedTour myExp = new ExportedTour(ants, averageCost, pheroMatrix);
 
             // And then store them as JSON for convenient use in python;
             String json = new Gson().toJson(myExp);
