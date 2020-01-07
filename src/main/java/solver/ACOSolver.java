@@ -1,12 +1,10 @@
 package solver;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import util.*;
 
@@ -45,7 +43,36 @@ public class ACOSolver {
 
         calcProbs();
 
-        initailizeAnts(this.antCount, probMat);
+        initailizeAnts(this.ref, this.antCount, probMat);
+    }
+
+    public List<List<Integer>> threadSolve() throws Exception {
+
+        List<Future<List<Integer>>> threadTours = new ArrayList<>();
+        ExecutorService antExecutor = Executors.newFixedThreadPool(antInstances.size());
+
+        for(Ant a : antInstances) {
+            threadTours.add(antExecutor.submit(a));
+        }
+
+        try {
+            antExecutor.shutdown();
+
+            if(antExecutor.awaitTermination(1, TimeUnit.MINUTES)) {
+                System.out.println("Thread-Ants finished!");
+
+                List<List<Integer>> ret = new ArrayList<>();
+                for(int i = 0; i < threadTours.size(); i++) {
+                    ret.add(threadTours.get(i).get());
+                }
+
+                return ret;
+            }
+        }
+        catch(Exception ex) {
+            System.err.println(ex);
+        }
+        return null;        
     }
 
     public void solve() {
@@ -60,7 +87,8 @@ public class ACOSolver {
             int antIdx = 0;
             double meanLength = 0;
             for (Ant nxt : antInstances) {
-                nxt.sovleProblem(this.ref);
+                
+                nxt.solve();
                 System.out.println("> Ant #" + antIdx + " generated a Tour with length = " + nxt.getTourCost());
                 meanLength += nxt.getTourCost();
                 
@@ -69,35 +97,43 @@ public class ACOSolver {
             double avgCost = (meanLength/antInstances.size());
             System.out.println("> Mean-Length: " + avgCost);
 
-            System.out.println("PRE Phero Update");
-            // MatrixHelper.prettyprintmatrix(this.phero);
-
             // TODO: Add heuristics here;
+            // antInstances.sort(new TourLengthComparator());
+            // for(Ant current : antInstances.subList(0, topAntCount)) {
+            //     Integer[] template = new Integer[current.getTour().size()];
 
+            //     HeuristicsHelper.setProblemReference(ref);
+            //     try {
+            //         HeuristicsHelper.nOpt(current.getTour().toArray(template));                    
+            //     }
+            //     catch(Exception e) {
+            //         System.out.println("hi!");
+            //     }
+            // }
+
+            // Evaporate pheromons;
             pheroVaporated();
 
             // Sort Ants by their tour length;
             antInstances.sort(new TourLengthComparator());
-            pheroDeposition(antInstances.subList(0, topAntCount));
 
-            System.out.println("POST Phero Update");
-            // MatrixHelper.prettyprintmatrix(this.phero);
+            // Use the amount of topAnts in order to deposite pheromons;
+            pheroDeposition(antInstances.subList(0, topAntCount));
 
             // Write all the generated tours into a file for later visualization;
             FileHelper.writeToursToFile(antInstances, avgCost, this.phero, iterCount);
 
-            // Update the probability matrix, that is being used in the next generation of
-            // Ants;
+            // Update the probability matrix, that is being used in the next generation of Ants;
             calcProbs();
 
-
             if(iterCount == this.iterCount-1) {
+                // Stop execution once the last iteration is done;
                 break;
             }
 
-            // Re-Initialize Ants for the next run;
+            // If it's not the last run: Re-Initialize Ants for the next run;
             this.antInstances = new ArrayList<>();
-            initailizeAnts(this.antCount, probMat);
+            initailizeAnts(this.ref, this.antCount, probMat);
 
             iterCount++;
         }
@@ -130,9 +166,9 @@ public class ACOSolver {
         }
     }
 
-    private void initailizeAnts(int n, double[][] probMat) {
+    private void initailizeAnts(CVRPProblemInstance ref, int n, double[][] probMat) {
         for (int i = 0; i < n; i++) {
-            this.antInstances.add(new Ant(probMat, ref.capacity));
+            this.antInstances.add(new Ant(probMat, ref.capacity, ref));
         }
     }
 
