@@ -56,22 +56,7 @@ public class Test {
         ACOSolver mySolv = new ACOSolver(bier, iterCount, antAmount, topAntCount, pheroValue, alpha, beta, gamma, roh,
                 theta);
 
-
         mySolv.solve();
-
-        // try {
-        //     var touris = mySolv.threadSolve();
-
-        //     System.out.println("Got tours from threadSolve()!");
-        //     for(var i : touris) {
-        //         System.out.println(i);
-        //     }
-
-        // } catch (Exception e) {
-        //     // TODO Auto-generated catch block
-        //     e.printStackTrace();
-        // }
-
 
         System.out.println("---------- DONE ----------");
     }
