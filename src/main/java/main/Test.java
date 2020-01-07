@@ -30,7 +30,7 @@ public class Test {
         String line;
         String json = "";
 
-        while((line = br.readLine()) != null) {
+        while ((line = br.readLine()) != null) {
             json += line;
         }
         br.close();
@@ -39,22 +39,38 @@ public class Test {
 
         CVRPProblemInstance bier = new CVRPProblemInstance(test);
 
-        //-----PARAMETER for AOC-------//
-        int iterCount = 200;
+        // -----PARAMETER for AOC-------//
+        int iterCount = 10;
         int antAmount = 15;
         int topAntCount = 5;
 
         double pheroValue = 100000.0;
-        //------ weights for Probabilitycalculation ------ //
-        double alpha = 1; //weight Pheromonvalue
+        // ------ weights for Probabilitycalculation ------ //
+        double alpha = 1; // weight Pheromonvalue
         double beta = 1; // weight Attractivness
         double gamma = 1; // weight Favoability
-        //------ parameters for Vaporation ------ //
+        // ------ parameters for Vaporation ------ //
         double roh = 0.8;
         double theta = 80;
 
-        ACOSolver mySolv = new ACOSolver(bier, iterCount, antAmount, topAntCount, pheroValue, alpha, beta, gamma, roh, theta);
+        ACOSolver mySolv = new ACOSolver(bier, iterCount, antAmount, topAntCount, pheroValue, alpha, beta, gamma, roh,
+                theta);
+
+
         mySolv.solve();
+
+        // try {
+        //     var touris = mySolv.threadSolve();
+
+        //     System.out.println("Got tours from threadSolve()!");
+        //     for(var i : touris) {
+        //         System.out.println(i);
+        //     }
+
+        // } catch (Exception e) {
+        //     // TODO Auto-generated catch block
+        //     e.printStackTrace();
+        // }
 
 
         System.out.println("---------- DONE ----------");
