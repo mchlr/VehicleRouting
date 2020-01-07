@@ -6,7 +6,7 @@ import java.util.concurrent.Callable;
 import model.CVRPProblemInstance;
 import util.MatrixHelper;
 
-public class Ant implements Callable<List<Integer>> {
+public class Ant implements Callable<Ant> {
 
     private CVRPProblemInstance problemRef;
 
@@ -74,14 +74,23 @@ public class Ant implements Callable<List<Integer>> {
         //int dMod = -1;
 
         double[] probWheel = new double[modDim];
+
+        // Calculate the column sum for normalizing the prob-wheel;
+        Double probSum =0.0;
+        for(int z = 0; z < probMat[(i)].length; z++) {
+            probSum += probMat[(i)][z];
+        }
+
         for (int x = 0; x < modDim; x++) {
             for (int y = x+1; y <= modDim; y++) {
                 if(this.tour.contains(y)) {
                     continue;
                 }
                 else {
-                    probWheel[x] += probMat[(i)][y];
+                    probWheel[x] += probMat[(i)][y]/probSum;
                 }
+
+                // probWheel[x] += probMat[(i)][y]/probSum;
             }
         }
 
@@ -204,8 +213,8 @@ public class Ant implements Callable<List<Integer>> {
     }
     
     @Override
-    public List<Integer> call() throws Exception {
+    public Ant call() throws Exception {
         solve();
-        return this.tour;
+        return this;
     }
 }
