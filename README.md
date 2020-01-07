@@ -2,8 +2,7 @@
 
 ## Informations
 
-This is the official Repository for work related to the H-BRS's DataScience Project from WS19/20 by Tobias Krieger and Michael Renn.
-Supervised by the one and only Peter "Wackelpeter" Becker.
+This is the official Repository for work related to the H-BRS's DataScience Project from WS19/20 by Tobias Krieger and Michael Renn. Supervised by Peter Becker.
 
 ## Presentation
 
