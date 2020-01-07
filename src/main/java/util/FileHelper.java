@@ -12,24 +12,34 @@ import util.model.ExportedTour;
 
 public class FileHelper {
 
-    private static String runTimeInfo = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
+    private String runTimeInfo;
+    private List<ExportedTour> tourData;
 
-    public static void writeToursToFile(List<Ant> ants, Double averageCost, double[][] pheroMatrix, Integer genNum) {
+    public FileHelper() {
+        runTimeInfo = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
+        tourData = new ArrayList<>();
+    }
+
+    public void writeStoredToursToFile() {
         try {
-            ExportedTour myExp = new ExportedTour(ants, averageCost, pheroMatrix);
+            for(int i = 0; i < this.tourData.size(); i++) {
+                // And then store them as JSON for convenient use in python;
+                String json = new Gson().toJson(this.tourData.get(i));
 
-            // And then store them as JSON for convenient use in python;
-            String json = new Gson().toJson(myExp);
+                File file = new File("output/" + runTimeInfo + "/gen_" + i + ".json");
+                file.getParentFile().mkdirs(); // < Allows the File/FileWriter to create a directory;
 
-            File file = new File("output/" + runTimeInfo + "/gen_" + genNum + ".json");
-            file.getParentFile().mkdirs(); // < Allows the File/FileWriter to create a directory;
-
-            try (FileWriter fw = new FileWriter(file)) {
-                fw.write(json);
+                try (FileWriter fw = new FileWriter(file)) {
+                    fw.write(json);
+                }
             }
         } catch (IOException e) {
             System.err.println("Error while writing Tours to file! :(\n");
             System.err.println(e);
         }
+    }
+
+    public void storeTour(List<Ant> ants, Double averageCost, double[][] pheroMatrix, Integer genNum) {
+        tourData.add(new ExportedTour(ants, averageCost, pheroMatrix));
     }
 }

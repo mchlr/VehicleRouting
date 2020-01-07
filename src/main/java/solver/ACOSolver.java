@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import heuristics.HeuristicsHelper;
 import util.*;
 
 import model.CVRPProblemInstance;
@@ -46,56 +47,79 @@ public class ACOSolver {
         initailizeAnts(this.ref, this.antCount, probMat);
     }
 
-    public List<List<Integer>> threadSolve() throws Exception {
+    // public List<Ant> threadSolve() throws Exception {
 
-        List<Future<List<Integer>>> threadTours = new ArrayList<>();
-        ExecutorService antExecutor = Executors.newFixedThreadPool(antInstances.size());
+    //     List<Future<Ant>> threadAnts = new ArrayList<>();
+    //     ExecutorService antExecutor = Executors.newFixedThreadPool(antInstances.size());
 
-        for(Ant a : antInstances) {
-            threadTours.add(antExecutor.submit(a));
-        }
+    //     for(Ant a : antInstances) {
+    //         threadAnts.add(antExecutor.submit(a));
+    //     }
 
-        try {
-            antExecutor.shutdown();
+    //     try {
+    //         antExecutor.shutdown();
 
-            if(antExecutor.awaitTermination(1, TimeUnit.MINUTES)) {
-                System.out.println("Thread-Ants finished!");
+    //         if(antExecutor.awaitTermination(1, TimeUnit.MINUTES)) {
+    //             System.out.println("Thread-Ants finished!");
 
-                List<List<Integer>> ret = new ArrayList<>();
-                for(int i = 0; i < threadTours.size(); i++) {
-                    ret.add(threadTours.get(i).get());
-                }
+    //             List<Ant> ret = new ArrayList<>();
+    //             for(int i = 0; i < threadAnts.size(); i++) {
+    //                 ret.add(threadAnts.get(i).get());
+    //             }
 
-                return ret;
-            }
-        }
-        catch(Exception ex) {
-            System.err.println(ex);
-        }
-        return null;        
-    }
+    //             return ret;
+    //         }
+    //     }
+    //     catch(Exception ex) {
+    //         System.err.println("Error while multithreading Ants! :(");
+    //         System.err.println(ex);
+    //     }
+    //     return null;        
+    // }
 
     public void solve() {
         int iterCount = 0;
-
+        Date startTime = Calendar.getInstance().getTime();
+        ExecutorService antExecutor = null;
+        FileHelper myFileHelper = new FileHelper();
+     
         System.out.println("Now solving: " + ref.name + " with AntColonyOptimization!");
+
 
         while (iterCount < this.iterCount) {
             System.out.println("\n");
-            System.out.println("Iteration #" + iterCount + " started!");
-
-            int antIdx = 0;
+            
+            antExecutor = Executors.newFixedThreadPool(antInstances.size());
             double meanLength = 0;
-            for (Ant nxt : antInstances) {
-                
-                nxt.solve();
-                System.out.println("> Ant #" + antIdx + " generated a Tour with length = " + nxt.getTourCost());
-                meanLength += nxt.getTourCost();
-                
-                antIdx++;
+
+            // Add Ants into the ExecutorService;
+            List<Future<Ant>> threadAnts = new ArrayList<>();
+            for(Ant a : antInstances) {
+                threadAnts.add(antExecutor.submit(a));
             }
+    
+            // Run Ants using multiple threads;
+            try {
+                antExecutor.shutdown();
+    
+                if(antExecutor.awaitTermination(1, TimeUnit.MINUTES)) {
+    
+                    List<Ant> ret = new ArrayList<>();
+                    for(int i = 0; i < threadAnts.size(); i++) {
+                        Ant tmp = threadAnts.get(i).get();
+                        meanLength += tmp.getTourCost();
+                        ret.add(tmp);
+                    }
+                    antInstances = ret;
+                }
+            }
+            catch(Exception ex) {
+                System.err.println("Error while multithreading Ants! :(");
+                System.err.println(ex);
+            }
+
             double avgCost = (meanLength/antInstances.size());
-            System.out.println("> Mean-Length: " + avgCost);
+            System.out.println("> Iteration #" + iterCount +  " - Mean tour cost = " + avgCost);
 
             // TODO: Add heuristics here;
             // antInstances.sort(new TourLengthComparator());
@@ -104,7 +128,7 @@ public class ACOSolver {
 
             //     HeuristicsHelper.setProblemReference(ref);
             //     try {
-            //         HeuristicsHelper.nOpt(current.getTour().toArray(template));                    
+            //         HeuristicsHelper.nOpt(current.getTour().toArray(template), 4);                    
             //     }
             //     catch(Exception e) {
             //         System.out.println("hi!");
@@ -120,8 +144,8 @@ public class ACOSolver {
             // Use the amount of topAnts in order to deposite pheromons;
             pheroDeposition(antInstances.subList(0, topAntCount));
 
-            // Write all the generated tours into a file for later visualization;
-            FileHelper.writeToursToFile(antInstances, avgCost, this.phero, iterCount);
+            // Store the current tour into the file helper for later visualization;
+            myFileHelper.storeTour(antInstances, avgCost, this.phero, iterCount);
 
             // Update the probability matrix, that is being used in the next generation of Ants;
             calcProbs();
@@ -138,17 +162,25 @@ public class ACOSolver {
             iterCount++;
         }
 
-        System.out.println("Ant Colony finished!!!!!!!!!!");
+        System.out.println("Optimization finished!");
         System.out.println("\n");
 
+        System.out.println("Top-Ants");
         int i = 1;
         for(Ant curr : antInstances) {
-            System.out.println(i++ + " = " + curr.getTourCost());
+            System.out.println("#" + (i++) + " = " + curr.getTourCost());
         }
         System.out.println("\n");
 
-        MatrixHelper.prettyprintmatrix(this.phero);
+        System.out.println("\n");
+        System.out.println("Writing Tours to disk...");
+        myFileHelper.writeStoredToursToFile();
 
+        System.out.println("Done! \n\n");
+
+        Date endTime = Calendar.getInstance().getTime();
+        System.out.println("Started ACO  at: " + startTime);
+        System.out.println("Finished ACO at: " + endTime);
     }
 
     // #region Initialization Methods
@@ -178,7 +210,6 @@ public class ACOSolver {
 
     private void pheroDeposition(List<Ant> topAnts) {
 
-        System.out.println("Pheromone deposition started");
         int sig = topAnts.size();
         int lamb = 1;
 
@@ -198,7 +229,6 @@ public class ACOSolver {
                 double sigLamb = /* this.phero[antTour.get(i)][antTour.get(i+1)] + */ (sig - lamb)
                         / currAnt.getTourCost();
 
-                // TODO: Check, if the current Arc (i -> i+1) is a part of bestTour;
                 double sigStar = containsArc(bestTour, new int[] { antTour.get(i), antTour.get(i + 1) })
                         ? (sig / bestTourCost)
                         : 0;
@@ -208,27 +238,15 @@ public class ACOSolver {
             }
             lamb += 1;
         }
-
-        System.out.println("Pheromone deposition done");
-        // MatrixHelper.prettyprintmatrix(this.phero);
-        System.out.println("\n");
     }
 
     // Update PheroMatrix with Vaporated Method
     private void pheroVaporated() {
-
-        System.out.println("Pheromone evaporation started");
-
         for (int i = 0; i < phero.length; i++) {
             for (int j = 0; j < phero.length; j++) {
                 phero[i][j] = (roh + (theta / Lavg(antInstances))) * phero[i][j];
             }
         }
-
-        System.out.println("Pheromone evaporation done");
-        // MatrixHelper.prettyprintmatrix(this.phero);
-        System.out.println("\n");
-
     }
 
     // #endregion
@@ -256,8 +274,6 @@ public class ACOSolver {
     private void calcProbs() {
 
         if (probMat == null) {
-            System.out.println("calcProbs() - Matrix is null! Initializing...");
-
             // Modified Dimensions for ignoring the depot
             // Therefore, use dimensions -1
             // This implies, that the idx's in the array have to be calculated like (idx+1)
@@ -276,14 +292,6 @@ public class ACOSolver {
             double sumProbDis = 0;
             for (int i = 0; i < ref.getDimensions(); i++) {
                 for (int j = 0; j < ref.getDimensions(); j++) {
-
-                    // double pheroCalc = Math.pow(phero[i][j], alpha);
-                    // double heustVal = i == j ? 1 : Math.pow(1 / ref.getDistance(i, j), beta);
-                    // double distSafe = Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) -
-                    // ref.getDistance(i, j), gamma);
-
-                    // sumProbDis += pheroCalc * heustVal * distSafe;
-
                     sumProbDis += Math.pow(phero[i][j], alpha)
                             * (i == j ? 1 : Math.pow(1 / ref.getDistance(i, j), beta))
                             * Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma);
@@ -306,34 +314,10 @@ public class ACOSolver {
                         c_One = ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j);
                     }
                     var c = Math.pow(c_One, gamma);
-                                        
-                    //var c = Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma);
-
-
-                    // var r_One = ((a * b * c) / (sumProbDis)*100.0);
-                    // var r_Two = Math.round(r_One);
-                    // var r_Three = r_Two/100.0;
-                    // probMat[i][j] = r_Three;
 
                     probMat[i][j] = (a * b * c) / (sumProbDis);
-
-
-
-
-
-
-                    // probMat[i][j] = ((Math.pow(phero[i][j], alpha)
-                    //         * (i == j ? 1 : Math.pow(1 / ref.getDistance(i, j), beta))
-                    //         * Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma))
-                    //         / (sumProbDis));
                 }
             }
         }
-
-        System.out.println("\nProbabilities updated...");
-        // MatrixHelper.fuckYouPrintMatrix(probMat);
-
-
-        var myDebug = probMat;
     }
 }
