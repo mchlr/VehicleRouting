@@ -1,23 +1,28 @@
 package solver;
 
 import java.util.*;
+import java.util.concurrent.Callable;
 
 import model.CVRPProblemInstance;
 import util.MatrixHelper;
 
-public class Ant {
+public class Ant implements Callable<List<Integer>> {
+
+    private CVRPProblemInstance problemRef;
+
     private List<Integer> tour;
     private double tourCost;
     private double[][] probMat;
     private int capacity;
     private int load;
 
-    public Ant(double[][] probMat, int capacity) {
+    public Ant(double[][] probMat, int capacity, CVRPProblemInstance prob) {
         tourCost = 0;
         load = 0;
         tour = new ArrayList<>();
         this.probMat = probMat;
         this.capacity = capacity;
+        this.problemRef = prob;
     }
 
     // Get-Methods;
@@ -30,28 +35,28 @@ public class Ant {
     }
 
     // Starting Point;
-    public void sovleProblem(CVRPProblemInstance prob) {
+    public void solve() {
 
         if (probMat == null) {
-            generateRandomTour(prob);
+            generateRandomTour();
         } else {
-            generateProbabilityBasedTour(prob);
+            generateProbabilityBasedTour();
         }
 
-        calculateTourCost(prob);
+        calculateTourCost();
     }
 
-    private void generateProbabilityBasedTour(CVRPProblemInstance prob) {
+    private void generateProbabilityBasedTour() {
         this.tour.add(0);
         int i = 0;
 
-        while (getUniqueCount(this.tour) < (prob.getDimensions())) {
+        while (getUniqueCount(this.tour) < (problemRef.getDimensions())) {
             if (i != 0) {
-                generateStep(i, prob);
+                generateStep(i);
 
             } else {
                 // Will only get hit in the first iteration;
-                generateStep(0, prob);
+                generateStep(0);
             }
 
             // Move to next node;
@@ -62,53 +67,10 @@ public class Ant {
         this.tour.add(0);
     }
 
-    private void generateFirstStep(CVRPProblemInstance prob) {
-        
-        int modDim = prob.getDimensions()-1;
-
-        double[] probWheel = new double[modDim];
-        for (int x = 0; x < modDim; x++) {
-            for (int y = x+1; y <= modDim; y++) {
-                probWheel[x] += probMat[0][y];
-            }
-        }
-
-        var wheelie = probWheel;
-
-        double decision = Math.random();
-
-        System.out.println("Entscheidung:" + decision);
-
-        for (int d = 0; d < probWheel.length; d++) {
-            boolean a = false;
-            boolean b = false;
-            
-            if (d == probWheel.length - 1) {
-                a = 0 < decision; // I guess thats always true^^
-                b = decision <= probWheel[d];
-            }
-            else {
-                a = probWheel[d + 1] < decision;
-                b = decision <= probWheel[d];    
-            }
-            if (a && b) {
-
-                // Also mod the vertex-index since the probabilities within probWheel regard the nodes 1 -> n (Without Depot!);
-                // Glauben, dass wir das hier nicht brauchen;
-                int dMod = d+1; 
-                
-                tour.add(dMod);
-                load += prob.getDemand(dMod);
-                System.out.println("Prob move from " + 0 + " -> " + dMod);
-            }
-        }
-    }
-
-
-    private void generateStep(int i, CVRPProblemInstance prob) {
+    private void generateStep(int i) {
 
         // Use modDim since we are ignoring the depot node (=> -1) for this;
-        int modDim = prob.getDimensions()-1;
+        int modDim = problemRef.getDimensions()-1;
         //int dMod = -1;
 
         double[] probWheel = new double[modDim];
@@ -154,9 +116,9 @@ public class Ant {
                 // Also mod the vertex-index since the probabilities within probWheel regard the nodes 1 -> n (Without Depot!);
                 int dMod = d+1; 
                 if (!tour.contains(dMod)) {
-                    if (this.capacity >= (this.load + prob.getDemand(dMod))) {
+                    if (this.capacity >= (this.load + problemRef.getDemand(dMod))) {
                         tour.add(dMod);
-                        load += prob.getDemand(dMod);
+                        load += problemRef.getDemand(dMod);
                         
                  //       System.out.println(">> New node reached!");
                     } else {
@@ -164,7 +126,7 @@ public class Ant {
                         tour.add(dMod);
                         //System.out.println("Prob move from " + i + " -> 0");
                         load = 0;
-                        load += prob.getDemand(dMod);
+                        load += problemRef.getDemand(dMod);
                         // System.out.println("Prob move from 0 -> " + dMod);
                     }
                     // System.out.println(Arrays.toString(probWheel));
@@ -173,7 +135,7 @@ public class Ant {
                 //   System.out.println(">> Already reached!");
 
                     // Ant war schon an dem Knoten, der gewählt wurde
-                    generateStep(i, prob);
+                    generateStep(i);
                 }
 
             }
@@ -183,14 +145,14 @@ public class Ant {
         }
     }
 
-    private void generateRandomStep(CVRPProblemInstance prob) {
-        int randJ = (int) (Math.random() * prob.getDimensions());
+    private void generateRandomStep() {
+        int randJ = (int) (Math.random() * problemRef.getDimensions());
         if (!tour.contains(randJ)) {
             tour.add(randJ);
             System.out.println("Rand moved from 0 -> " + tour.get(tour.size() - 1));
         }
         else {
-            generateRandomStep(prob);
+            generateRandomStep();
         }
     }
 
@@ -198,24 +160,24 @@ public class Ant {
         return new HashSet<Integer>(tour).size();
     }
 
-    private void calculateTourCost(CVRPProblemInstance prob) {
+    private void calculateTourCost() {
         // Calculate the total cost of the tour;
         for (int x = 0; x < tour.size() - 1; x++) {
-            tourCost += prob.getDistance(tour.get(x), tour.get(x + 1));
+            tourCost += this.problemRef.getDistance(tour.get(x), tour.get(x + 1));
         }
     }
 
     // Outsource this as a static method into a TourClass?
-    private void generateRandomTour(CVRPProblemInstance prob) {
+    private void generateRandomTour() {
         this.tour.add(0);
         int i = 0;
 
-        while (getUniqueCount(this.tour) < (prob.getDimensions())) {
-            int randJ = (int) (Math.random() * (prob.getDimensions() - 1));
+        while (getUniqueCount(this.tour) < (this.problemRef.getDimensions())) {
+            int randJ = (int) (Math.random() * (this.problemRef.getDimensions() - 1));
 
             if (!this.tour.contains((randJ))) {
                 // Get the next customers demand;
-                int demandJ = prob.getDemand(randJ);
+                int demandJ = this.problemRef.getDemand(randJ);
 
                 // Check if the capcity allows visiting the next customer, or if we have to
                 // visit the depot first;
@@ -238,6 +200,12 @@ public class Ant {
         // Back to depot
         this.tour.add(0);
 
-        calculateTourCost(prob);
+        calculateTourCost();
+    }
+    
+    @Override
+    public List<Integer> call() throws Exception {
+        solve();
+        return this.tour;
     }
 }
