@@ -81,7 +81,7 @@ public class ACOSolver {
         int iterCount = 0;
         Date startTime = Calendar.getInstance().getTime();
         ExecutorService antExecutor = null;
-        FileHelper myFileHelper = new FileHelper();
+        FileHelper myFileHelper = new FileHelper(ref.name);
      
         System.out.println("Now solving: " + ref.name + " with AntColonyOptimization!");
 

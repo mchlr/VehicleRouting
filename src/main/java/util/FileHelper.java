@@ -1,11 +1,13 @@
 package util;
 
+
 import java.io.*;
 import java.util.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 import com.google.gson.Gson;
+
 
 import solver.Ant;
 import util.model.ExportedTour;
@@ -15,8 +17,8 @@ public class FileHelper {
     private String runTimeInfo;
     private List<ExportedTour> tourData;
 
-    public FileHelper() {
-        runTimeInfo = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
+    public FileHelper(String prob) {
+        runTimeInfo =  prob+ "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
         tourData = new ArrayList<>();
     }
 
