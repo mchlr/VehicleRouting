@@ -73,7 +73,7 @@ class Index(object):
         dirname = os.listdir("../data")
         for probs in dirname:
             if probs[0:len(probs)-5] == prob:
-                print(True)
+                #print(True)
                 jsonfile="../data" + "/"+ probs
                 with open(jsonfile, 'r') as f:
                     data = f.read()
@@ -83,12 +83,6 @@ class Index(object):
 
 
     def plotTour(tours,coords,count):
-        
-        print("plotTour Kontrolle")
-        print(str(coords))
-       
-
-
         coordX = []
         coordY = []
             
@@ -100,7 +94,7 @@ class Index(object):
         toursX = []
         toursY = []
         for tour in tours:
-            print(tour)
+            # print(tour)
             tourNodesX = []
             tourNodesY = []
 
@@ -123,11 +117,40 @@ class Index(object):
 
 
         for i in range(len(toursX)):
-            print("#" + str(i) + str(toursX[i]) + "/" + str(toursY[i]))
+            # print("#" + str(i) + str(toursX[i]) + "/" + str(toursY[i]))
             plt.plot(toursX[i], toursY[i], color=np.random.rand(3,), label="Tour #" + str(i))
 
         plt.title('Tourplot Gen_'+str(count))
         plt.draw()
+    
+
+    def minix():
+        indiz = 0
+        for avgs in avgcost:
+            indiz += 1
+            if avgs==min(avgcost): 
+                return indiz
+
+    def goto(self,event):
+        plt.subplot(2,2,1)
+        plt.cla()
+        plt.imshow(phero[Index.minix()], cmap="Blues", interpolation='nearest')
+        plt.title('Phermones Gen_'+str(Index.minix()))
+
+        Index.plotTour([tour[Index.minix()]],coord,Index.minix())
+
+        plt.draw()
+
+    def norm(matrix):
+        
+        # print(matrix)
+
+        # for zeile in matrix:
+        #     for spalte in matrix:
+        #            print("Vorher: "+str(zeile)+str(spalte))
+        #             matrix[i][j] = matrix[[i][j]]/sum([j])
+        # #           print("Nachher: "+str(matrix[i][j]))
+        return matrix
 
 
     def readjson(self, event):    
@@ -157,11 +180,11 @@ class Index(object):
                     data = f.read()
                     jsondata = js.loads(data)
                     avgcost.append(jsondata["averageCost"])
-                    phero.append(np.matrix(jsondata["pheromons"]))
+                    phero.append(jsondata["pheromons"])
                     tour.append(jsondata["antTour"][0])
         #Plot Pheros
         plt.subplot(2,2,1)
-        plt.imshow(phero[0], cmap="Blues", interpolation='nearest')
+        plt.imshow(Index.norm(np.asmatrix(phero[0])), cmap="Blues", interpolation='nearest')
         plt.title('Pheromones Gen_0')
 
        
@@ -172,6 +195,7 @@ class Index(object):
         plt.cla()
         plt.plot(X, avgcost, color="black")
         plt.plot([0,len(avgcost)],[a,a+len(avgcost)*b],c="red",alpha=0.5,lineWidth = 3)
+        plt.scatter(Index.minix(), min(avgcost), c="green",linewidths= 4)
         plt.title('Average Tourcost')
 
         #Plot Graph
@@ -179,6 +203,8 @@ class Index(object):
 
         plt.draw()
         
+
+  
         
                 
 
@@ -196,12 +222,15 @@ callback = Index()
 axprev = plt.axes([0.7, 0.05, 0.1, 0.075])
 axnext = plt.axes([0.81, 0.05, 0.1, 0.075])
 axsel = plt.axes([0.5, 0.05, 0.1, 0.075])
+axgoto = plt.axes([0.2, 0.05, 0.1, 0.075])
 bnext = Button(axnext, 'Next')
 bnext.on_clicked(callback.next)
 bprev = Button(axprev, 'Previous')
 bprev.on_clicked(callback.prev)
 bsel = Button(axsel,'Select Data')
 bsel.on_clicked(callback.readjson)
+bgoto = Button(axgoto,'Goto Minimum')
+bgoto.on_clicked(callback.goto)
 
         
 
