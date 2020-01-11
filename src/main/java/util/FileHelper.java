@@ -18,7 +18,7 @@ public class FileHelper {
     private List<ExportedTour> tourData;
 
     public FileHelper(String prob) {
-        runTimeInfo =  prob+ "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
+        runTimeInfo =  prob + "-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH_mm"));
         tourData = new ArrayList<>();
     }
 
