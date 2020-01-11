@@ -47,41 +47,15 @@ public class ACOSolver {
         initailizeAnts(this.ref, this.antCount, probMat);
     }
 
-    // public List<Ant> threadSolve() throws Exception {
-
-    //     List<Future<Ant>> threadAnts = new ArrayList<>();
-    //     ExecutorService antExecutor = Executors.newFixedThreadPool(antInstances.size());
-
-    //     for(Ant a : antInstances) {
-    //         threadAnts.add(antExecutor.submit(a));
-    //     }
-
-    //     try {
-    //         antExecutor.shutdown();
-
-    //         if(antExecutor.awaitTermination(1, TimeUnit.MINUTES)) {
-    //             System.out.println("Thread-Ants finished!");
-
-    //             List<Ant> ret = new ArrayList<>();
-    //             for(int i = 0; i < threadAnts.size(); i++) {
-    //                 ret.add(threadAnts.get(i).get());
-    //             }
-
-    //             return ret;
-    //         }
-    //     }
-    //     catch(Exception ex) {
-    //         System.err.println("Error while multithreading Ants! :(");
-    //         System.err.println(ex);
-    //     }
-    //     return null;        
-    // }
-
     public void solve() {
         int iterCount = 0;
         Date startTime = Calendar.getInstance().getTime();
+
         ExecutorService antExecutor = null;
         FileHelper myFileHelper = new FileHelper();
+        HeuristicsHelper.setProblemReference(ref);
+
+        Comparator tourLengthComp = new TourLengthComparator();
      
         System.out.println("Now solving: " + ref.name + " with AntColonyOptimization!");
 
@@ -121,25 +95,19 @@ public class ACOSolver {
             double avgCost = (meanLength/antInstances.size());
             System.out.println("> Iteration #" + iterCount +  " - Mean tour cost = " + avgCost);
 
-            // TODO: Add heuristics here;
-            // antInstances.sort(new TourLengthComparator());
-            // for(Ant current : antInstances.subList(0, topAntCount)) {
-            //     Integer[] template = new Integer[current.getTour().size()];
+            
 
-            //     HeuristicsHelper.setProblemReference(ref);
-            //     try {
-            //         HeuristicsHelper.nOpt(current.getTour().toArray(template), 4);                    
-            //     }
-            //     catch(Exception e) {
-            //         System.out.println("hi!");
-            //     }
-            // }
+            // Sort Ants by their tour length;
+            antInstances.sort(tourLengthComp);
+
+            // Apply heuristic;
+            for(Ant current : antInstances.subList(0, topAntCount)) {
+                Integer[] template = new Integer[current.getTour().size()]; 
+                current.setTour(Arrays.asList(HeuristicsHelper.nOpt(current.getTour().toArray(template), 4)));
+            }
 
             // Evaporate pheromons;
             pheroVaporated();
-
-            // Sort Ants by their tour length;
-            antInstances.sort(new TourLengthComparator());
 
             // Use the amount of topAnts in order to deposite pheromons;
             pheroDeposition(antInstances.subList(0, topAntCount));
