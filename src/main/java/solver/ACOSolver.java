@@ -52,10 +52,14 @@ public class ACOSolver {
         Date startTime = Calendar.getInstance().getTime();
 
         ExecutorService antExecutor = null;
+<<<<<<< HEAD
         FileHelper myFileHelper = new FileHelper();
         HeuristicsHelper.setProblemReference(ref);
 
         Comparator tourLengthComp = new TourLengthComparator();
+=======
+        FileHelper myFileHelper = new FileHelper(ref.name);
+>>>>>>> 6e9a80f71012971304aa44040def663a19b62eb1
      
         System.out.println("Now solving: " + ref.name + " with AntColonyOptimization!");
 
