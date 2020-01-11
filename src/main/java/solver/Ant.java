@@ -34,6 +34,10 @@ public class Ant implements Callable<Ant> {
         return this.tourCost;
     }
 
+    public void setTour(List<Integer> newTour) {
+        this.tour = newTour;
+    }
+
     // Starting Point;
     public void solve() {
 
