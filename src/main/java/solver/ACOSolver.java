@@ -196,9 +196,8 @@ public class ACOSolver {
             Integer[] template = new Integer[currAnt.getTour().size()];
 
 
-         //   for(int i=0; i <topAnts.size()-1; i++){
-         //       HeuristicsHelper.Swap(topAnts.get(i).getTour().toArray(template), topAnts.get(i + 1).getTour().toArray(template));
-         // }
+            HeuristicsHelper.Swap(currAnt.getTour().toArray(template));
+
 
 
             for (int i = 0; i < antTour.size() - 1; i++) {

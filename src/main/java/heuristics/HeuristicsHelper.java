@@ -160,11 +160,10 @@ public class HeuristicsHelper {
 
     private static boolean checkCapacity(Integer [] tour){
         int subtourCap=0;
-        int k=0;
         boolean check = false;
         for(int i = 0; i < tour.length-1; i++ ){
            // System.out.println(tour.length);
-            if(subtourCap<=probReference.capacity){
+            if(subtourCap <= probReference.capacity){
                 check =true;
             }else{
                 return false;
@@ -172,57 +171,67 @@ public class HeuristicsHelper {
 
             if(tour[i]==0) {
                 subtourCap = 0;
-                k++;
             }else{
                // System.out.println("CheckCap counter: "+i);
-              subtourCap +=  probReference.getDemand(i-k);
+              subtourCap +=  probReference.getDemand(tour[i]);
             }
 
         }
         return check;
+
     }
 
 
 
-    public static /*Integer []*/void Swap(Integer[] tour1, Integer[] tour2){
 
-        ArrayList<Integer> swapped1 = new ArrayList<Integer>();
-        ArrayList<Integer> swapped2 = new ArrayList<Integer>();
+    public static /*Integer []*/void Swap(Integer[] tour){
 
-        Integer[] bestTour = tour1;
-        Integer[] newTour = new Integer[tour1.length];
+        ArrayList<Integer> tours = new ArrayList<Integer>();
+        ArrayList<Integer> rnd = new ArrayList<Integer>();
+        ArrayList<Integer> rndBoarders = new ArrayList<Integer>();
+        ArrayList<Boolean> checkthis = new ArrayList<Boolean>();
+
+        Collections.addAll(tours, tour);
+        Integer[] bestTour = tour;
+        Integer[] cloneTour ;
+
         boolean check=false;
-        int i =0 ;
 
-
-        for(int u = 0; u < tour1.length-1; u++){
-            swapped1.add(u);
-            swapped2.add(u);
+        for(int i=0; i<tour.length; i++) {
+            if (tour[i] == 0){
+                rndBoarders.add(i);
+            }
         }
-       // System.out.println(swapped1);
-      //  System.out.println(swapped2);
-      Collections.shuffle(swapped1);
-        System.out.println(swapped1);
-      Collections.shuffle(swapped2);
-        System.out.println(swapped2);
 
-        for(int k=0; i<swapped1.size()-1; i++){
-
-            if(tour1[swapped1.get(k)]==0) {
-                tour1[k] = 0;
-            }else{
-                System.out.println("Bevor Swap: ");
-                System.out.println(calculateTourCost(tour1));
-
-                tour1[swapped1.get(k)] = tour2[swapped2.get(k)];
+        //System.out.println(rndBoarders.toString());
 
 
-                System.out.println("Nach Swap: ");
-                System.out.println(calculateTourCost(tour1));
 
-                System.out.println(checkCapacity(tour1));
 
-                check = (calculateTourCost(tour1)<calculateTourCost(bestTour)) && checkCapacity(tour1);
+        for(int i=0; i<tour.length; i++) {
+            rnd.clear();
+            for(int k =0; k < rndBoarders.size()-1; k++) {
+                rnd.add((int)(Math.random() * ((rndBoarders.get(k+1) - rndBoarders.get(k)) + 1)) + rndBoarders.get(k));
+            }
+            //System.out.println(rnd.toString());
+
+
+            // System.out.println("Before Swap: "+  tours.toString());
+
+            Collections.swap(tours,rnd.get((int)(Math.random() * ((rnd.size()-1) + 1))),(int)(Math.random() * ((rnd.size()-1) + 1)));
+
+            //System.out.println("After Swap:  "+ tours.toString());
+
+
+            cloneTour = tours.stream().toArray(Integer[]::new);
+
+            check = (calculateTourCost(cloneTour)<calculateTourCost(bestTour)) && checkCapacity(cloneTour);
+
+            checkthis.add(check);
+
+
+
+
 
 
                 if(/*(calculateTourCost(tour1)<calculateTourCost(bestTour) ) && checkCapacity(tour1)*/check == true){
@@ -230,12 +239,14 @@ public class HeuristicsHelper {
                  /*   return tour1;*/
                 }
             }
-        }
-        //System.out.println("Nichts ist passiert");
+        System.out.println(checkthis.contains(Boolean.TRUE));
+
+    }
+
        /* return bestTour; */
 
     }
 
 
 
-}
+
