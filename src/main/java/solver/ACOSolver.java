@@ -103,12 +103,12 @@ public class ACOSolver {
 
             // Apply heuristic;
             for(Ant current : antInstances.subList(0, topAntCount)) {
-                Integer[] template = new Integer[current.getTour().size()]; 
+                Integer[] template = new Integer[current.getTour().size()];
                 current.setTour(Arrays.asList(HeuristicsHelper.nOpt(current.getTour().toArray(template), 4)));
             }
 
             // Evaporate pheromons;
-            pheroVaporated();
+             pheroVaporated();
 
             // Use the amount of topAnts in order to deposite pheromons;
             pheroDeposition(antInstances.subList(0, topAntCount));
@@ -193,6 +193,13 @@ public class ACOSolver {
 
         for (Ant currAnt : topAnts) {
             List<Integer> antTour = currAnt.getTour();
+            Integer[] template = new Integer[currAnt.getTour().size()];
+
+
+         //   for(int i=0; i <topAnts.size()-1; i++){
+         //       HeuristicsHelper.Swap(topAnts.get(i).getTour().toArray(template), topAnts.get(i + 1).getTour().toArray(template));
+         // }
+
 
             for (int i = 0; i < antTour.size() - 1; i++) {
                 double sigLamb = /* this.phero[antTour.get(i)][antTour.get(i+1)] + */ (sig - lamb)

@@ -3,6 +3,7 @@ package heuristics;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.Collections;
 
 import model.CVRPProblemInstance;
 import util.MathHelper;
@@ -152,4 +153,89 @@ public class HeuristicsHelper {
 
         return work.toArray(new Integer[tour.length]);
     }
+
+
+
+
+
+    private static boolean checkCapacity(Integer [] tour){
+        int subtourCap=0;
+        int k=0;
+        boolean check = false;
+        for(int i = 0; i < tour.length-1; i++ ){
+           // System.out.println(tour.length);
+            if(subtourCap<=probReference.capacity){
+                check =true;
+            }else{
+                return false;
+            }
+
+            if(tour[i]==0) {
+                subtourCap = 0;
+                k++;
+            }else{
+               // System.out.println("CheckCap counter: "+i);
+              subtourCap +=  probReference.getDemand(i-k);
+            }
+
+        }
+        return check;
+    }
+
+
+
+    public static /*Integer []*/void Swap(Integer[] tour1, Integer[] tour2){
+
+        ArrayList<Integer> swapped1 = new ArrayList<Integer>();
+        ArrayList<Integer> swapped2 = new ArrayList<Integer>();
+
+        Integer[] bestTour = tour1;
+        Integer[] newTour = new Integer[tour1.length];
+        boolean check=false;
+        int i =0 ;
+
+
+        for(int u = 0; u < tour1.length-1; u++){
+            swapped1.add(u);
+            swapped2.add(u);
+        }
+       // System.out.println(swapped1);
+      //  System.out.println(swapped2);
+      Collections.shuffle(swapped1);
+        System.out.println(swapped1);
+      Collections.shuffle(swapped2);
+        System.out.println(swapped2);
+
+        for(int k=0; i<swapped1.size()-1; i++){
+
+            if(tour1[swapped1.get(k)]==0) {
+                tour1[k] = 0;
+            }else{
+                System.out.println("Bevor Swap: ");
+                System.out.println(calculateTourCost(tour1));
+
+                tour1[swapped1.get(k)] = tour2[swapped2.get(k)];
+
+
+                System.out.println("Nach Swap: ");
+                System.out.println(calculateTourCost(tour1));
+
+                System.out.println(checkCapacity(tour1));
+
+                check = (calculateTourCost(tour1)<calculateTourCost(bestTour)) && checkCapacity(tour1);
+
+
+                if(/*(calculateTourCost(tour1)<calculateTourCost(bestTour) ) && checkCapacity(tour1)*/check == true){
+                    System.out.println("Bessere Tour gefunden");
+                 /*   return tour1;*/
+                }
+            }
+        }
+        //System.out.println("Nichts ist passiert");
+       /* return bestTour; */
+
+    }
+
+
+
 }
