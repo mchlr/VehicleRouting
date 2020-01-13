@@ -184,7 +184,7 @@ public class HeuristicsHelper {
 
 
 
-    public static /*Integer []*/void Swap(Integer[] tour){
+    public static Integer [] Swap(Integer[] tour){
 
         ArrayList<Integer> tours = new ArrayList<Integer>();
         ArrayList<Integer> rnd = new ArrayList<Integer>();
@@ -227,25 +227,22 @@ public class HeuristicsHelper {
 
             check = (calculateTourCost(cloneTour)<calculateTourCost(bestTour)) && checkCapacity(cloneTour);
 
-            checkthis.add(check);
-
-
-
+           // checkthis.add(check);
 
 
 
                 if(/*(calculateTourCost(tour1)<calculateTourCost(bestTour) ) && checkCapacity(tour1)*/check == true){
-                    System.out.println("Bessere Tour gefunden");
-                 /*   return tour1;*/
+                  System.out.println("Bessere Tour gefunden");
+                  return cloneTour;
                 }
             }
-        System.out.println(checkthis.contains(Boolean.TRUE));
 
+        return bestTour;
     }
 
-       /* return bestTour; */
 
-    }
+
+}
 
 
 

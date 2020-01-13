@@ -196,7 +196,7 @@ public class ACOSolver {
             Integer[] template = new Integer[currAnt.getTour().size()];
 
 
-            HeuristicsHelper.Swap(currAnt.getTour().toArray(template));
+            currAnt.setTour(Arrays.asList(HeuristicsHelper.Swap(currAnt.getTour().toArray(template))));
 
 
 

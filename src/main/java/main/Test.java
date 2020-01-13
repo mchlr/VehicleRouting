@@ -22,7 +22,8 @@ public class Test {
         // Note base-path on mac os is "/VehicleRouting/"";
 
         // String fileName = "data/att48.json";
-        String fileName = "data/att48.json.bark";
+        //String fileName = "data/att48.json";
+        String fileName = "data/AN38k5.json";
 
         File file = new File(fileName);
         FileReader fr = new FileReader(file);
@@ -40,11 +41,11 @@ public class Test {
         CVRPProblemInstance bier = new CVRPProblemInstance(test);
 
         // -----PARAMETER for AOC-------//
-        int iterCount = 10;
-        int antAmount = 15;
-        int topAntCount = 5;
+        int iterCount = 10000;
+        int antAmount = 1000;
+        int topAntCount = 100;
 
-        double pheroValue = 100000.0;
+        double pheroValue = 1.0;
         // ------ weights for Probabilitycalculation ------ //
         double alpha = 1; // weight Pheromonvalue
         double beta = 1; // weight Attractivness

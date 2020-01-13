@@ -85,6 +85,7 @@ class Index(object):
     def plotTour(tours,coords,count):
         coordX = []
         coordY = []
+      #  print("Anfang:" +str(coords))
             
         for node in coords:
             coordX.append(node[0])
@@ -188,6 +189,16 @@ class Index(object):
         plt.title('Pheromones Gen_0')
 
        
+        # print("GEILER SCHEIß PHEEEEEEEEEEEEERO")
+        # for lenas in phero:
+        #     print(lenas)
+        # print("IS KLAR DIGGA VADDA")
+
+
+
+
+
+
         #Plot AVGCOST
         X=range(len(avgcost))
         b, a, r, p, std = linregress(X,avgcost)
@@ -195,7 +206,9 @@ class Index(object):
         plt.cla()
         plt.plot(X, avgcost, color="black")
         plt.plot([0,len(avgcost)],[a,a+len(avgcost)*b],c="red",alpha=0.5,lineWidth = 3)
-        plt.scatter(Index.minix(), min(avgcost), c="green",linewidths= 4)
+        plt.scatter(Index.minix()-1, min(avgcost), c="green",linewidths= 3)
+        plt.vlines(x=Index.minix()-1, ymin = 0, ymax = min(avgcost) ,color="green",linestyle='-')
+        plt.hlines(min(avgcost),xmin=0, xmax= Index.minix(),colors="green")
         plt.title('Average Tourcost')
 
         #Plot Graph
