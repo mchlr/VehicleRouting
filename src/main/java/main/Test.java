@@ -42,11 +42,11 @@ public class Test {
 
         // -----PARAMETER for AOC-------//
         int iterCount = 5000;
-        int antAmount = 15;
-        int topAntCount = 5;
+        int antAmount = 150;
+        int topAntCount = 50;
 
         // Terminate the algorithm if the best solution isn't undershot after n-Iterations;
-        int terminateAfterNoBetterForIterations = 500;
+        int terminateAfterNoBetterForIterations = 250;
 
         double pheroValue = 10000.0;
         // ------ weights for Probabilitycalculation ------ //
