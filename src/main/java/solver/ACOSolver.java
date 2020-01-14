@@ -99,16 +99,8 @@ public class ACOSolver {
             double avgCost = (meanLength/antInstances.size());
             System.out.println("> Iteration #" + iterCount +  " - Mean tour cost = " + avgCost);
 
-            
-
             // Sort Ants by their tour length;
             antInstances.sort(TourLengthComparator.getInstance());
-
-            // Apply heuristic;
-            for(Ant current : antInstances.subList(0, topAntCount)) {
-                Integer[] template = new Integer[current.getTour().size()];
-                current.setTour(Arrays.asList(HeuristicsHelper.nOpt(current.getTour().toArray(template), 3)));
-            }
 
             // Evaporate pheromons;
             pheroVaporated();
@@ -122,7 +114,8 @@ public class ACOSolver {
             // Update the probability matrix, that is being used in the next generation of Ants;
             calcProbs();
 
-            // Check Mincost
+            // Check the tour-length of the best ant.
+            // If there is a new smallest-tour-ever => Update minCost to the cost of this tour & minIter to the generation number where this tour was found;
             if(antInstances.get(0).getTourCost() < minCost){
                 minCost = antInstances.get(0).getTourCost();
                 minIter = iterCount;
@@ -205,13 +198,11 @@ public class ACOSolver {
             }
         }
 
-        for (Ant currAnt : topAnts) {
+        for (Ant currAnt : topAnts) {         
+            currAnt.setTour(Arrays.asList(HeuristicsHelper.twoOpt(currAnt.getTour().toArray(Integer[]::new))));
+            currAnt.setTour(Arrays.asList(HeuristicsHelper.Swap(currAnt.getTour().toArray(Integer[]::new))));
+
             List<Integer> antTour = currAnt.getTour();
-            Integer[] template = new Integer[currAnt.getTour().size()];
-
-
-            currAnt.setTour(Arrays.asList(HeuristicsHelper.Swap(currAnt.getTour().toArray(template))));
-
 
 
             for (int i = 0; i < antTour.size() - 1; i++) {
