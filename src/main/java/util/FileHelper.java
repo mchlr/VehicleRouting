@@ -44,4 +44,9 @@ public class FileHelper {
     public void storeTour(List<Ant> ants, Double averageCost, double[][] pheroMatrix, Integer genNum) {
         tourData.add(new ExportedTour(ants, averageCost, pheroMatrix));
     }
+
+    public Map<List<List<Integer>>, List<Double>> getTour(Integer genNum) {
+        var data = tourData.get(genNum);
+        return Map.of(data.antTour, data.tourCost);
+    }
 }

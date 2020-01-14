@@ -41,11 +41,14 @@ public class Test {
         CVRPProblemInstance bier = new CVRPProblemInstance(test);
 
         // -----PARAMETER for AOC-------//
-        int iterCount = 10000;
-        int antAmount = 1000;
-        int topAntCount = 100;
+        int iterCount = 5000;
+        int antAmount = 15;
+        int topAntCount = 5;
 
-        double pheroValue = 1.0;
+        // Terminate the algorithm if the best solution isn't undershot after n-Iterations;
+        int terminateAfterNoBetterForIterations = 500;
+
+        double pheroValue = 10000.0;
         // ------ weights for Probabilitycalculation ------ //
         double alpha = 1; // weight Pheromonvalue
         double beta = 1; // weight Attractivness
@@ -54,7 +57,7 @@ public class Test {
         double roh = 0.8;
         double theta = 80;
 
-        ACOSolver mySolv = new ACOSolver(bier, iterCount, antAmount, topAntCount, pheroValue, alpha, beta, gamma, roh,
+        ACOSolver mySolv = new ACOSolver(bier, iterCount, terminateAfterNoBetterForIterations, antAmount, topAntCount, pheroValue, alpha, beta, gamma, roh,
                 theta);
 
         mySolv.solve();

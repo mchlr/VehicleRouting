@@ -24,9 +24,10 @@ public class ACOSolver {
     private double gamma;
     private double roh;
     private double theta;
+    private int noBetterFor;
     private List<Ant> antInstances;
 
-    public ACOSolver(CVRPProblemInstance ref, int iterCount, int antAmount, int topAntCount, double pheroValue, double alpha, double beta, double gamma, double roh,
+    public ACOSolver(CVRPProblemInstance ref, int iterCount, int betterCount, int antAmount, int topAntCount, double pheroValue, double alpha, double beta, double gamma, double roh,
             double theta) {
         this.ref = ref;
         this.iterCount = iterCount;
@@ -38,6 +39,7 @@ public class ACOSolver {
         this.probMat = null;
         this.roh = roh;
         this.theta = theta;
+        this.noBetterFor = betterCount;
 
         this.antCount = antAmount;
         initializePheroMatrix(pheroValue);
@@ -49,13 +51,14 @@ public class ACOSolver {
 
     public void solve() {
         int iterCount = 0;
+
+        double minCost = Double.MAX_VALUE;
+        Integer minIter = -1;
+
         Date startTime = Calendar.getInstance().getTime();
 
         FileHelper myFileHelper = new FileHelper(ref.name);
         HeuristicsHelper.setProblemReference(ref);
-
-        Comparator tourLengthComp = new TourLengthComparator();
-
         ExecutorService antExecutor = null;
 
         System.out.println("Now solving: " + ref.name + " with AntColonyOptimization!");
@@ -99,16 +102,16 @@ public class ACOSolver {
             
 
             // Sort Ants by their tour length;
-            antInstances.sort(tourLengthComp);
+            antInstances.sort(TourLengthComparator.getInstance());
 
             // Apply heuristic;
             for(Ant current : antInstances.subList(0, topAntCount)) {
                 Integer[] template = new Integer[current.getTour().size()];
-                current.setTour(Arrays.asList(HeuristicsHelper.nOpt(current.getTour().toArray(template), 4)));
+                current.setTour(Arrays.asList(HeuristicsHelper.nOpt(current.getTour().toArray(template), 3)));
             }
 
             // Evaporate pheromons;
-             pheroVaporated();
+            pheroVaporated();
 
             // Use the amount of topAnts in order to deposite pheromons;
             pheroDeposition(antInstances.subList(0, topAntCount));
@@ -119,8 +122,19 @@ public class ACOSolver {
             // Update the probability matrix, that is being used in the next generation of Ants;
             calcProbs();
 
-            if(iterCount == this.iterCount-1) {
-                // Stop execution once the last iteration is done;
+            // Check Mincost
+            if(antInstances.get(0).getTourCost() < minCost){
+                minCost = antInstances.get(0).getTourCost();
+                minIter = iterCount;
+            }
+
+
+            if( (iterCount - minIter >= noBetterFor)) {
+                System.out.println("No improved solution since generation " + minIter + ".\n(Done additional " + noBetterFor + " iterations)");
+                break;
+            }
+            if((iterCount == this.iterCount-1) ) {
+                System.out.println("Max Iteration reached!\nTerminating Algorithm...");
                 break;
             }
 
@@ -134,18 +148,18 @@ public class ACOSolver {
         System.out.println("Optimization finished!");
         System.out.println("\n");
 
-        System.out.println("Top-Ants");
+        System.out.println("Top-Ants from best generation");
+
         int i = 1;
-        for(Ant curr : antInstances) {
-            System.out.println("#" + (i++) + " = " + curr.getTourCost());
+        Map<List<List<Integer>>, List<Double>> bestGen = myFileHelper.getTour(minIter);
+        for(List<List<Integer>> tour : bestGen.keySet()) {
+            System.out.println("#" + i + " => " +  bestGen.get(tour));
         }
         System.out.println("\n");
 
-        System.out.println("\n");
         System.out.println("Writing Tours to disk...");
         myFileHelper.writeStoredToursToFile();
-
-        System.out.println("Done! \n\n");
+        System.out.println("Done! \n");
 
         Date endTime = Calendar.getInstance().getTime();
         System.out.println("Started ACO  at: " + startTime);
@@ -213,6 +227,9 @@ public class ACOSolver {
             }
             lamb += 1;
         }
+
+        // Add normalization here;
+
     }
 
     // Update PheroMatrix with Vaporated Method
