@@ -1,8 +1,6 @@
 package heuristics;
 
 import java.util.*;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import java.util.Collections;
 
 import model.CVRPProblemInstance;
@@ -28,7 +26,7 @@ public class HeuristicsHelper {
     // Create the change template (Route without depot visits -> aka BigTour);
     // Integer[] changeTemplate = Arrays.asList(ogTour).stream().filter(x -> x >
     // 0).collect(Collectors.toList()).toArray(ogTour);
-    public static Integer[] nOpt(Integer[] ogTour, Integer changeCount) {
+    public static Integer[] randomOpt(Integer[] ogTour, Integer changeCount) {
 
         if (probReference == null) {
             return null;
@@ -103,12 +101,6 @@ public class HeuristicsHelper {
                 minIdx = i;
             }
         }
-
-        // Log-Stuff for debugging;
-        // System.out.println("Length (Original): " + originalTourCost);
-        // System.out.println("Length (Min-Perm): " + minCost);
-
-
 
         // Check if the originalTour, or the permutated one is shorter and return the shorter one;
         return originalTourCost < minCost ? ogTour : permTours.get(minIdx);
