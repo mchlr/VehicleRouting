@@ -20,9 +20,10 @@ from scipy.stats import linregress
 
 coord =[]
 tour=[]
-avgcost = []
+tourcost = []
 phero = []
 X = []
+best=0
 
 plt.figure(figsize=(80, 80))
 
@@ -69,7 +70,9 @@ class Index(object):
 
     def getProb(prob):
         global coord
+        global best
         coord.clear()
+        best=0
         dirname = os.listdir("../data")
         for probs in dirname:
             if probs[0:len(probs)-5] == prob:
@@ -79,6 +82,7 @@ class Index(object):
                     data = f.read()
                     jsondata = js.loads(data)
                     coord.append((jsondata["node_coordinates"]))
+                    best = jsondata["Optimal_value"]
                     coord = coord[0]
 
 
@@ -126,11 +130,12 @@ class Index(object):
     
 
     def minix():
-        indiz = 0
-        for avgs in avgcost:
+        indiz = 1
+        for avgs in tourcost:            
             indiz += 1
-            if avgs==min(avgcost): 
-                return indiz
+            if avgs==min(tourcost): 
+              #  print("Minimum at: "+str(indiz)+" : "+str(min(tourcost)))
+                return indiz-2
 
     def goto(self,event):
         plt.subplot(2,2,1)
@@ -144,25 +149,39 @@ class Index(object):
 
     def norm(matrix):
         
-        # print(matrix)
+    #     for zeile in Matrix:
+    #         for spalte in Matrix:
+    #             matrix[][]
+    #   #  print(type(matrix))
+        
 
-        # for zeile in matrix:
-        #     for spalte in matrix:
-        #            print("Vorher: "+str(zeile)+str(spalte))
-        #             matrix[i][j] = matrix[[i][j]]/sum([j])
-        # #           print("Nachher: "+str(matrix[i][j]))
+
         return matrix
 
 
+    def plotTourcost():
+        X=range(len(tourcost))
+        b, a, r, p, std = linregress(X,tourcost)
+        plt.subplot(2,2,(3,4))
+        plt.cla()
+        plt.plot(X, tourcost, color="black")
+        plt.plot([0,len(tourcost)],[a,a+len(tourcost)*b],c="red",alpha=0.5,lineWidth = 3)
+        plt.scatter(Index.minix(), min(tourcost), c="green",linewidths= 3)
+        plt.vlines(x=Index.minix(), ymin = 0, ymax = min(tourcost) ,color="green",linestyle='-')
+        plt.hlines(min(tourcost),xmin=0, xmax= Index.minix(),colors="green")
+        plt.hlines(best,xmin=0, xmax=len(X), colors="orange")
+        plt.title('Tourcost')
+
     def readjson(self, event):    
-        global avgcost
+        global tourcost
         global phero
         global tour
         global X
 
-        avgcost.clear()
+        tourcost.clear()
         phero.clear()
         tour.clear()
+
     
 
         dirname = tk.filedialog.askdirectory(initialdir="/",  title='Please select a directory')
@@ -180,7 +199,7 @@ class Index(object):
                 with open(jsonfile, 'r') as f:
                     data = f.read()
                     jsondata = js.loads(data)
-                    avgcost.append(jsondata["averageCost"])
+                    tourcost.append(jsondata["tourCost"][0])
                     phero.append(jsondata["pheromons"])
                     tour.append(jsondata["antTour"][0])
         #Plot Pheros
@@ -194,22 +213,16 @@ class Index(object):
         #     print(lenas)
         # print("IS KLAR DIGGA VADDA")
 
+        # i=0
+        # for cost in tourcost:
+        #     print("Indizie: "+str(i)+":"+ str(cost))
+        #     i=i+1
 
 
 
 
-
-        #Plot AVGCOST
-        X=range(len(avgcost))
-        b, a, r, p, std = linregress(X,avgcost)
-        plt.subplot(2,2,(3,4))
-        plt.cla()
-        plt.plot(X, avgcost, color="black")
-        plt.plot([0,len(avgcost)],[a,a+len(avgcost)*b],c="red",alpha=0.5,lineWidth = 3)
-        plt.scatter(Index.minix()-1, min(avgcost), c="green",linewidths= 3)
-        plt.vlines(x=Index.minix()-1, ymin = 0, ymax = min(avgcost) ,color="green",linestyle='-')
-        plt.hlines(min(avgcost),xmin=0, xmax= Index.minix(),colors="green")
-        plt.title('Average Tourcost')
+        #Plot Tourcost
+        Index.plotTourcost()
 
         #Plot Graph
         Index.plotTour([tour[0]],coord,0)

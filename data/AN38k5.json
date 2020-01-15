@@ -1,6 +1,7 @@
 {
     "name" : "AN38k5",
     "comment" : "(Augerat et al, Min no of trucks: 5, Optimal value: 730)",
+    "Optimal_value" : 730,
     "type" : "CVRP",
     "dimension" : 38,
     "edge_weight_type" : "EUC_2D",
