@@ -108,8 +108,7 @@ public class ACOSolver {
             // Use the amount of topAnts in order to deposite pheromons;
             pheroDeposition(antInstances.subList(0, topAntCount));
 
-            // Store the current tour into the file helper for later visualization;
-            myFileHelper.storeTour(antInstances, avgCost, this.phero, iterCount);
+
 
             // Update the probability matrix, that is being used in the next generation of Ants;
             calcProbs();
@@ -119,7 +118,12 @@ public class ACOSolver {
             if(antInstances.get(0).getTourCost() < minCost){
                 minCost = antInstances.get(0).getTourCost();
                 minIter = iterCount;
+
+                myFileHelper.setMinIndex(minIter);
             }
+
+            // Store the current tour into the file helper for later visualization;
+            myFileHelper.storeTour(iterCount, antInstances, avgCost, probMat);
 
 
             if( (iterCount - minIter >= noBetterFor)) {
@@ -143,12 +147,12 @@ public class ACOSolver {
 
         System.out.println("Top-Ants from best generation");
 
-        int i = 1;
-        Map<List<List<Integer>>, List<Double>> bestGen = myFileHelper.getTour(minIter);
-        for(List<List<Integer>> tour : bestGen.keySet()) {
-            System.out.println("#" + i + " => " +  bestGen.get(tour));
-        }
-        System.out.println("\n");
+        // int i = 1;
+        // Map<List<List<Integer>>, List<Double>> bestGen = myFileHelper.getTour(minIter);
+        // for(List<List<Integer>> tour : bestGen.keySet()) {
+        //     System.out.println("#" + i + " => " +  bestGen.get(tour));
+        // }
+        // System.out.println("\n");
 
         System.out.println("Writing Tours to disk...");
         myFileHelper.writeStoredToursToFile();
