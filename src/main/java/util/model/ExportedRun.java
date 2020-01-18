@@ -19,6 +19,10 @@ public class ExportedRun {
     public void setBestGenIndex(Integer num) {
         bestGenerationIndex = num;
     }
+
+    public Integer getBestTourCost() {
+        return (int)Math.round(allGenerations.get(bestGenerationIndex).allCosts.get(0));
+    }
     
 
     // GenerationStats(Integer genNum, List<Ant> allAnts, Integer bestAntIdx, Double averageCost, double[][] probabilities) {

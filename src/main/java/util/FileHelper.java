@@ -25,7 +25,7 @@ public class FileHelper {
             // And then store them as JSON for convenient use in python;
             String json = new Gson().toJson(this.tourData);
 
-            File file = new File("output/" + runTimeInfo + ".json");
+            File file = new File("output/" + (runTimeInfo + "-bestcost_" + (Integer)tourData.getBestTourCost() ) + "/ExportedRun.json");
             file.getParentFile().mkdirs(); // < Allows the File/FileWriter to create a directory;
 
             try (FileWriter fw = new FileWriter(file)) {
