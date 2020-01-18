@@ -298,7 +298,7 @@ public class ACOSolver {
                     }
                     var c = Math.pow(c_One, gamma);
 
-                    probMat[i][j] = (a * b * c) / (sumProbDis);
+                    probMat[i][j] = Double.isNaN((a * b * c) / (sumProbDis)) ? 0.0 : (a * b * c) / (sumProbDis);
                 }
             }
         }
