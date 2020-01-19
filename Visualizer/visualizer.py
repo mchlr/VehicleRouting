@@ -69,6 +69,25 @@ class Index(object):
 
         plt.draw()
 
+    def reshape(array):
+        #print(str(array))
+    #s = str(array[0])
+    #print(s)
+    #s=s.replace(" ", "")
+    # print(s)
+    # s=s[2:-2]
+    # print(s)
+    # s=s.replace(",0,",",0],[0,")
+    # print(s)
+    # s="[0"+s+"0]"
+    # print(s)
+    # s=list(eval(s)) 
+        return list(eval("[0"+str(array[0]).replace(" ", "")[2:-2].replace(",0,",",0],[0,") +"0]")) 
+
+
+
+
+
 
 
     def getProb(prob):
@@ -90,6 +109,7 @@ class Index(object):
 
 
     def plotTour(tours,coords,count):
+        tours=Index.reshape(tours)
         coordX = []
         coordY = []
       #  print("Anfang:" +str(coords))
