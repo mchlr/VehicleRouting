@@ -64,9 +64,7 @@ This method has to get modified according to the change of the phero-Matrix desc
 
 ### Visualizer
 
-* Add Support for tour-files produced by the program
-* Add the use of matplotlib widgets for cycling through the generated tours
-
+* Add persicion on analysis.py plot
 
 ### Heuristics
 Finish implementation of various heuristics:
