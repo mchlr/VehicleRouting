@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.concurrent.Callable;
 
 import model.CVRPProblemInstance;
-import util.MatrixHelper;
 
 public class Ant implements Callable<Ant> {
 
