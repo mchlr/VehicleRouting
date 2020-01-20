@@ -19,11 +19,13 @@ from scipy.stats import linregress
 
 
 coord =[]
-tour=[]
-tourcost = []
-phero = []
+tourCost = []
+alltours = []
+bestGenerationIndex = 0
+probabilityMatrix = []
 X = []
-best=0
+best = 0;
+
 
 plt.figure(figsize=(80, 80))
 
@@ -43,28 +45,48 @@ class Index(object):
 
     def next(self, event):
         self.ind += 1
-        i = self.ind % len(phero)
+        i = self.ind % len(probabilityMatrix)
 
         plt.subplot(2,2,1)
         plt.cla()
-        plt.imshow(phero[self.ind], cmap="Blues", interpolation='nearest')
+        plt.imshow(probabilityMatrix
+        [self.ind], cmap="Blues", interpolation='nearest')
         plt.title('Phermones Gen_'+str(self.ind))
         plt.draw()
 
-        Index.plotTour([tour[self.ind]],coord,self.ind)
+        Index.plotTour([alltours[self.ind]],coord,self.ind)
 
 
     def prev(self, event):
         self.ind -= 1
-        i = self.ind % len(phero)
+        i = self.ind % len(probabilityMatrix)
         plt.subplot(2,2,1)
         plt.cla()
-        plt.imshow(phero[self.ind], cmap="Blues", interpolation='nearest')
+        plt.imshow(probabilityMatrix[self.ind], cmap="Blues", interpolation='nearest')
         plt.title('Phermones Gen_'+str(self.ind))  
     
-        Index.plotTour([tour[self.ind]],coord,self.ind)
+        Index.plotTour([alltours[self.ind]],coord,self.ind)
 
         plt.draw()
+
+    def reshape(array):
+        #print(str(array))
+    #s = str(array[0])
+    #print(s)
+    #s=s.replace(" ", "")
+    # print(s)
+    # s=s[2:-2]
+    # print(s)
+    # s=s.replace(",0,",",0],[0,")
+    # print(s)
+    # s="[0"+s+"0]"
+    # print(s)
+    # s=list(eval(s)) 
+        return list(eval("[0"+str(array[0]).replace(" ", "")[2:-2].replace(",0,",",0],[0,") +"0]")) 
+
+
+
+
 
 
 
@@ -87,6 +109,7 @@ class Index(object):
 
 
     def plotTour(tours,coords,count):
+        tours=Index.reshape(tours)
         coordX = []
         coordY = []
       #  print("Anfang:" +str(coords))
@@ -127,60 +150,43 @@ class Index(object):
 
         plt.title('Tourplot Gen_'+str(count))
         plt.draw()
-    
 
-    def minix():
-        indiz = 1
-        for avgs in tourcost:            
-            indiz += 1
-            if avgs==min(tourcost): 
-              #  print("Minimum at: "+str(indiz)+" : "+str(min(tourcost)))
-                return indiz-2
 
     def goto(self,event):
         plt.subplot(2,2,1)
         plt.cla()
-        plt.imshow(phero[Index.minix()], cmap="Blues", interpolation='nearest')
-        plt.title('Phermones Gen_'+str(Index.minix()))
-
-        Index.plotTour([tour[Index.minix()]],coord,Index.minix())
-
+        plt.imshow(probabilityMatrix[bestGenerationIndex], cmap="Blues", interpolation='nearest')
+        plt.title('Phermones Gen_'+str(bestGenerationIndex))
+        print(bestGenerationIndex)
+        print(str([tourCost[bestGenerationIndex]]))
+        Index.plotTour([alltours[bestGenerationIndex]],coord,bestGenerationIndex)
         plt.draw()
 
-    def norm(matrix):
-        
-    #     for zeile in Matrix:
-    #         for spalte in Matrix:
-    #             matrix[][]
-    #   #  print(type(matrix))
-        
-
-
-        return matrix
-
-
     def plotTourcost():
-        X=range(len(tourcost))
-        b, a, r, p, std = linregress(X,tourcost)
+        X=range(len(tourCost))
+        b, a, r, p, std = linregress(X,tourCost)
         plt.subplot(2,2,(3,4))
         plt.cla()
-        plt.plot(X, tourcost, color="black")
-        plt.plot([0,len(tourcost)],[a,a+len(tourcost)*b],c="red",alpha=0.5,lineWidth = 3)
-        plt.scatter(Index.minix(), min(tourcost), c="green",linewidths= 3)
-        plt.vlines(x=Index.minix(), ymin = 0, ymax = min(tourcost) ,color="green",linestyle='-')
-        plt.hlines(min(tourcost),xmin=0, xmax= Index.minix(),colors="green")
+        plt.plot(X, tourCost, color="black")
+        plt.plot([0,len(tourCost)],[a,a+len(tourCost)*b],c="red",alpha=0.5,lineWidth = 3)
+        plt.scatter(bestGenerationIndex, min(tourCost), c="green",linewidths= 3)
+        plt.vlines(x=bestGenerationIndex, ymin = 0, ymax = min(tourCost) ,color="green",linestyle='-')
+        plt.hlines(min(tourCost),xmin=0, xmax= bestGenerationIndex,colors="green")
         plt.hlines(best,xmin=0, xmax=len(X), colors="orange")
         plt.title('Tourcost')
 
     def readjson(self, event):    
-        global tourcost
-        global phero
-        global tour
+        global tourCost
         global X
+        global bestGenerationIndex
+        global alltours 
+        global bestGenerationIndex 
+        global probabilityMatrix 
 
-        tourcost.clear()
-        phero.clear()
-        tour.clear()
+
+        tourCost.clear()
+        alltours.clear()
+        probabilityMatrix.clear()
 
     
 
@@ -193,39 +199,30 @@ class Index(object):
         
         i=0
         for json in dirlist:
-            i+=1
+  
             jsonfile=dirname + "/"+ json
             if json:
                 with open(jsonfile, 'r') as f:
                     data = f.read()
-                    jsondata = js.loads(data)
-                    tourcost.append(jsondata["tourCost"][0])
-                    phero.append(jsondata["pheromons"])
-                    tour.append(jsondata["antTour"][0])
+                    jsondata = js.loads(data)      
+                    bestGenerationIndex = int(jsondata['bestGenerationIndex'])
+                    for generation in jsondata['allGenerations']:
+                        tourCost.append(jsondata['allGenerations'][i]['allCosts'][0])      
+                        alltours.append(jsondata['allGenerations'][i]['allTours'][0])  
+                        probabilityMatrix.append(jsondata['allGenerations'][i]['probabilityMatrix'])
+                        i += 1
+            
         #Plot Pheros
         plt.subplot(2,2,1)
-        plt.imshow(Index.norm(np.asmatrix(phero[0])), cmap="Blues", interpolation='nearest')
+        plt.imshow(probabilityMatrix[0], cmap="Blues", interpolation='nearest')
         plt.title('Pheromones Gen_0')
-
-       
-        # print("GEILER SCHEIß PHEEEEEEEEEEEEERO")
-        # for lenas in phero:
-        #     print(lenas)
-        # print("IS KLAR DIGGA VADDA")
-
-        # i=0
-        # for cost in tourcost:
-        #     print("Indizie: "+str(i)+":"+ str(cost))
-        #     i=i+1
-
-
 
 
         #Plot Tourcost
         Index.plotTourcost()
 
         #Plot Graph
-        Index.plotTour([tour[0]],coord,0)
+        Index.plotTour([alltours[0]],coord,0)
 
         plt.draw()
         

@@ -227,6 +227,8 @@ public class ACOSolver {
         for (int i = 0; i < phero.length; i++) {
             for (int j = 0; j < phero.length; j++) {
                 phero[i][j] = (roh + (theta / Lavg(antInstances))) * phero[i][j];
+
+              //  System.out.println(phero[i][j]);
             }
         }
     }
@@ -268,16 +270,52 @@ public class ACOSolver {
                 for (int j = 0; j < modDim; j++) {
                     var koelnCalc = i == j ? 0 : (1.0 / (modDim - 1));
                     probMat[i][j] = koelnCalc;
+
                 }
             }
         } else {
             double sumProbDis = 0;
+            double x,y,z;
+            double g,h,f,t;
+            double d=0;
             for (int i = 0; i < ref.getDimensions(); i++) {
                 for (int j = 0; j < ref.getDimensions(); j++) {
-                    sumProbDis += Math.pow(phero[i][j], alpha)
-                            * (i == j ? 1 : Math.pow(1 / ref.getDistance(i, j), beta))
-                            * Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma);
 
+                 //   System.out.println("########################");
+                 //   System.out.println("Math.pow(phero[i][j], alpha) = "+Math.pow(phero[i][j], alpha));
+                  //  System.out.println("(i == j ? 1 : Math.pow(1 / ref.getDistance(i, j), beta)) = "+(i == j ? 1 : Math.pow(1 / ref.getDistance(i, j), beta)));
+                  //  System.out.println("Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma) = "+Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma));
+                  //  System.out.println("########################");
+                   // System.out.println("Produkt: "+ Math.pow(phero[i][j], alpha)
+                  //          * (i == j ? 1 : Math.pow(1 / ref.getDistance(i, j), beta))
+                   //         * Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma));
+
+
+                    x =  Math.pow(phero[i][j], alpha)*0.01;
+                    y = (i == j ? 1 : Math.pow(1 / ref.getDistance(i, j), beta))*0.01;
+                    g= ref.getDistance(i, 0)*0.01;
+                    h= ref.getDistance(0, j)*0.01;
+                    f= ref.getDistance(i, j)*0.01;
+                    t= ((g+h )- f)*0.01;
+                    z = Math.pow(t, gamma)*0.01;
+
+                    //System.out.println("x: "+ x + " y: "+x+" z: "+ z+" d: "+ d);
+                    d =(x * y * z)*0.01;
+
+                    if(Double.isInfinite(d)){
+                      //      System.out.println("x: "+ x + " y: "+x+" z: "+ z+" d: "+ d);
+                            d = Double.MIN_VALUE;
+                    //        System.exit(0);
+                    }
+
+
+
+                    sumProbDis = sumProbDis + d;
+
+                 //   sumProbDis += Math.pow(phero[i][j], alpha)
+                  //          * (i == j ? 1 : Math.pow(1 / ref.getDistance(i, j), beta))
+                   //         * Math.pow(ref.getDistance(i, 0) + ref.getDistance(0, j) - ref.getDistance(i, j), gamma);
+                 //   System.out.println("sumProbDis: "+ sumProbDis);
                 }
             }
 
@@ -297,7 +335,23 @@ public class ACOSolver {
                     }
                     var c = Math.pow(c_One, gamma);
 
-                    probMat[i][j] = Double.isNaN((a * b * c) / (sumProbDis)) ? 0.0 : (a * b * c) / (sumProbDis);
+               //     System.out.println("########################");
+                 //   System.out.println("a*b*c: "+ a*b*c);
+                   // System.out.println("########################");
+
+                  //  System.out.println("########################");
+                   // System.out.println("sumProbDis: "+ sumProbDis);
+                   // System.out.println("########################");
+
+
+
+
+
+                    probMat[i][j] = (Double.isNaN((a * b * c) / (sumProbDis)) | Double.isInfinite((a * b * c) / (sumProbDis))) ? 0.0 : (a * b * c)*0.01 / (sumProbDis);
+                 //   probMat[i][j] = Double.isNaN((a * b * c) / (sumProbDis)) ? 0.0 : (a * b * c)*0.01 / (sumProbDis);
+
+
+
                 }
             }
         }
