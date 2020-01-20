@@ -57,7 +57,7 @@ public class ACOSolver {
 
         Date startTime = Calendar.getInstance().getTime();
 
-        FileHelper myFileHelper = new FileHelper(ref.name);
+        FileHelper myFileHelper = new FileHelper(ref.name, ref.dimension);
         HeuristicsHelper.setProblemReference(ref);
         ExecutorService antExecutor = null;
 
@@ -145,14 +145,9 @@ public class ACOSolver {
         System.out.println("Optimization finished!");
         System.out.println("\n");
 
-        System.out.println("Top-Ants from best generation");
+        System.out.println("**** Best Tour ****");
 
-        // int i = 1;
-        // Map<List<List<Integer>>, List<Double>> bestGen = myFileHelper.getTour(minIter);
-        // for(List<List<Integer>> tour : bestGen.keySet()) {
-        //     System.out.println("#" + i + " => " +  bestGen.get(tour));
-        // }
-        // System.out.println("\n");
+        System.out.println("** " + myFileHelper.getBestTour() + " - " + myFileHelper.getBestTourCost() + " **");
 
         System.out.println("Writing Tours to disk...");
         myFileHelper.writeStoredToursToFile();
