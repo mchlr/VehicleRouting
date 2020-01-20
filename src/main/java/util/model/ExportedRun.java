@@ -23,6 +23,14 @@ public class ExportedRun {
     public Integer getBestTourCost() {
         return (int)Math.round(allGenerations.get(bestGenerationIndex).allCosts.get(0));
     }
+
+    public List<Integer> getBestTour() {
+        return allGenerations.get(bestGenerationIndex).allTours.get(0);
+    }
+
+    public Boolean isEmpty() {
+        return this.allGenerations.isEmpty();
+    }
     
 
     // GenerationStats(Integer genNum, List<Ant> allAnts, Integer bestAntIdx, Double averageCost, double[][] probabilities) {
