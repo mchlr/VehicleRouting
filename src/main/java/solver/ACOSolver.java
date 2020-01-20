@@ -46,7 +46,7 @@ public class ACOSolver {
 
         calcProbs();
 
-        initailizeAnts(this.ref, this.antCount, probMat);
+        initailizeAnts();
     }
 
     public void solve() {
@@ -137,7 +137,7 @@ public class ACOSolver {
 
             // If it's not the last run: Re-Initialize Ants for the next run;
             this.antInstances = new ArrayList<>();
-            initailizeAnts(this.ref, this.antCount, probMat);
+            initailizeAnts();
 
             iterCount++;
         }
@@ -178,9 +178,9 @@ public class ACOSolver {
         }
     }
 
-    private void initailizeAnts(CVRPProblemInstance ref, int n, double[][] probMat) {
-        for (int i = 0; i < n; i++) {
-            this.antInstances.add(new Ant(probMat, ref.capacity, ref));
+    private void initailizeAnts() {
+        for (int i = 0; i < this.antCount; i++) {
+            this.antInstances.add(new Ant(this.probMat, this.ref.capacity, this.ref));
         }
     }
 
