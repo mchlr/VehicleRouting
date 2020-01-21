@@ -8,7 +8,13 @@ This is the official Repository for work related to the H-BRS's DataScience Proj
 
 Presentation done via LaTeX in Overleaf
 
-* (Add Link here)
+### ToDo
+
+* Folie 3 -> mit Bild erweitern
+* UML + Graphen -> Lesbarkeit sicherstellen bzw. Erhöhen
+
+
+ 	
 
 ## Visualization
 
