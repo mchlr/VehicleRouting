@@ -21,9 +21,8 @@ public class Test {
 
         // Note base-path on mac os is "/VehicleRouting/"";
 
-        // String fileName = "data/att48.json";
-        //String fileName = "data/att48.json";
-        String fileName = "data/AN38k5.json";
+        //String fileName = "data/AN38k5.json";
+        String fileName = "data/att48.json";
 
         File file = new File(fileName);
         FileReader fr = new FileReader(file);
@@ -41,12 +40,12 @@ public class Test {
         CVRPProblemInstance bier = new CVRPProblemInstance(test);
 
         // -----PARAMETER for AOC-------//
-        int iterCount = 5000;
-        int antAmount = 150;
-        int topAntCount = 50;
+        int iterCount = 50000;
+        int antAmount = 100;
+        int topAntCount = 33;
 
         // Terminate the algorithm if the best solution isn't undershot after n-Iterations;
-        int terminateAfterNoBetterForIterations = 250;
+        int terminateAfterNoBetterForIterations = 500;
 
         double pheroValue = 10000.0;
         // ------ weights for Probabilitycalculation ------ //
